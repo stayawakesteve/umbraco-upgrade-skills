@@ -1,0 +1,69 @@
+{
+  "skill_name": "umbraco-13-to-17-backoffice-frontend",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Site's been upgraded to v17 and I'm working through the tag helper updates. Need to migrate all our `<our-img>`, `<our-link>`, and `<our-rich-text>` tags. Is it just a find/replace or is there more to it? Also noticed `@Umbraco.GetDictionaryValue` is everywhere in our views — does that need updating too?",
+      "expected_output": "Confirms tag helper renames are a regex find/replace (provides one), but flags two extra considerations: `<etch-cms-img>` sizing parameters changed in v17 so don't migrate from memory, and the `OurIMG` config key in appsettings.json must NOT be renamed despite the tag rename. Confirms `GetDictionaryValue` should become `GetDictionaryValueOrDefault` — explains the behaviour change (v17 returns the literal key instead of empty when missing, which renders verbatim on the page). Recommends doing this before any QA pass. Points to taghelpers-migration.md.",
+      "files": [],
+      "expectations": [
+        "Confirms the <our-X> to <etch-cms-X> rename can be done via find/replace and provides a regex or command to do it",
+        "Flags that <etch-cms-img> sizing parameters changed in v17 — check the docs, don't migrate from memory",
+        "States that the OurIMG config key in appsettings.json must NOT be renamed despite the tag rename",
+        "States that @Umbraco.GetDictionaryValue should be replaced with @Umbraco.GetDictionaryValueOrDefault",
+        "Explains the behaviour change: v17 returns the literal key (not empty string) when the key is missing, causing it to render verbatim on the page",
+        "References taghelpers-migration.md"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "After our v17 upgrade, editors are complaining that the BlockList editor is doing weird double-render things — like the preview keeps flashing or sometimes the block content shows twice. BlockGrid editor is fine, only BlockList. Any idea what's up?",
+      "expected_output": "Identifies this as BlockPreview being enabled for BlockList — should be disabled in v17 because the v17 backoffice BlockList editor has its own preview behaviour that conflicts. Provides the appsettings.json fix (BlockPreview.BlockList.Enabled = false, while BlockPreview.BlockGrid stays enabled). Points to blocks-and-pickers.md.",
+      "files": [],
+      "expectations": [
+        "Identifies the cause as BlockPreview being enabled for BlockList (conflicts with v17's built-in BlockList preview behaviour)",
+        "Provides the appsettings.json fix to disable BlockPreview for BlockList",
+        "States BlockGrid should remain enabled — only BlockList needs to be disabled",
+        "References blocks-and-pickers.md"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Editors are reporting that the YouTube embed feature in the rich text editor doesn't work since we upgraded to v17. They click the YouTube button, paste a URL, and nothing happens — browser console shows some kind of CSP / referrer error. RTE works fine for everything else.",
+      "expected_output": "Identifies this as the YouTube backoffice CSP/Referrer-Policy issue. The fix is in Program.cs — middleware that overrides Referrer-Policy to 'strict-origin-when-cross-origin' for any request path starting with /umbraco. Notes this is technically a backend fix (cross-references umbraco-13-to-17-backend's program-cs-v17.md) but acknowledges the editor-facing symptom belongs to this skill. Provides the middleware code snippet.",
+      "files": [],
+      "expectations": [
+        "Identifies the cause as a Referrer-Policy issue affecting backoffice /umbraco routes",
+        "States the fix is in Program.cs — middleware overriding the Referrer-Policy header for /umbraco paths",
+        "Provides or describes the middleware code snippet for the Referrer-Policy override",
+        "Notes this is technically a backend change and cross-references umbraco-13-to-17-backend or program-cs-v17.md"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "We have a Block Grid data type on the site with about 20 block configurations. Each one has a label like `{{ heading }}` or `{{ value | ncNodeName }}`. After the v17 upgrade those labels are showing the raw template syntax instead of values in the backoffice. What's the new format?",
+      "expected_output": "Identifies this as the AngularJS → UFM (Umbraco Flavored Markdown) template syntax change. Provides the mapping: `{{ heading }}` → `{$heading}` or `{heading}`, `{{ value | ncNodeName }}` → `{umbContentName: value}`. Mentions this can be done either in the backoffice UI per data type OR by mass-editing the uSync data type config files (recommends the latter for 20 blocks). Notes the equivalent rewrite is needed in uSync nameTemplate fields, cross-references the db-content skill. Points to blocks-and-pickers.md and the nametemplate-rewrite.md in the db-content skill.",
+      "files": [],
+      "expectations": [
+        "Identifies this as the AngularJS to UFM (Umbraco Flavored Markdown) label template syntax change",
+        "Provides the mapping: {{ heading }} becomes {$heading} or {heading}",
+        "Provides the mapping: {{ value | ncNodeName }} becomes {umbContentName: value}",
+        "Mentions that mass-editing the uSync data type config files is an option (and preferable for 20 blocks)",
+        "References blocks-and-pickers.md"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Working through the v17 SCSS migration. I've imported blockpreview.scss from the v17 template. What else am I missing? The backoffice info partials look unstyled — they're showing in grey instead of our brand colour, and our block grid in the editor looks weird too.",
+      "expected_output": "Identifies multiple issues to address: (1) backoffice info SCSS needs the colour values migrated from the v13 variables/_color.scss into the v17 backoffice info styles — that's why they're grey; (2) `.umb-block-grid` rules should be REMOVED from editor.scss because they now ship in the package at App_Plugins/Etch.Cms.Umbraco/src/block-grid-shadow.css — local rules conflict; (3) picker styles should move from editor.scss to the App_Plugins/Etch.Cms.Umbraco/umbraco-package.json setup; (4) add .stylelintcache to .gitignore. Points to scss-and-partials.md.",
+      "files": [],
+      "expectations": [
+        "Identifies the grey backoffice info partials as needing brand colour values migrated from v13 SCSS variables into the v17 backoffice info styles",
+        "States that .umb-block-grid CSS rules should be REMOVED from editor.scss because they now ship inside the Etch.Cms package",
+        "Mentions that picker styles should move from editor.scss to the App_Plugins setup",
+        "Mentions adding .stylelintcache to .gitignore",
+        "References scss-and-partials.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "skill_name": "umbraco-13-to-17-backend",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Help me retarget the csproj for v17. Currently it's on net8.0, has inline package versions, and uses the standard v13 package set. I want to bring it in line with the v17 Etch.Cms template — including centralised package management. Here's the current csproj:\n\n```xml\n<Project Sdk=\"Microsoft.NET.Sdk.Web\">\n  <PropertyGroup>\n    <TargetFramework>net8.0</TargetFramework>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <Nullable>enable</Nullable>\n  </PropertyGroup>\n  <ItemGroup>\n    <PackageReference Include=\"Umbraco.Cms\" Version=\"13.x.x\" />\n    <PackageReference Include=\"Umbraco.Community.Contentment\" Version=\"4.x.x\" />\n    <PackageReference Include=\"Umbraco.Forms\" Version=\"13.x.x\" />\n    <PackageReference Include=\"uSync\" Version=\"13.x.x\" />\n    <PackageReference Include=\"Etch.Cms.Umbraco.Core\" Version=\"...\" />\n  </ItemGroup>\n</Project>\n```",
+      "expected_output": "Updates TargetFramework to net10.0, drops Version attributes (centralised), adds Umbraco.Cms.DevelopmentMode.Backoffice and the Umbraco.AI.* family (or at least mentions them as v17 additions), keeps Etch.Cms packages, includes the standard wwwroot/.vite content include and CopyRazorGenerateFilesToPublishDirectory property. Explains that versions now live in Directory.Packages.props. May mention RestorePackagesWithLockFile.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My build is failing with `The type or namespace name 'IPublishedSnapshotAccessor' could not be found (are you missing a using directive or an assembly reference?)`. It's referenced all over the place in my Models project generated files. This started after I bumped the Umbraco package version. What's going on?",
+      "expected_output": "Identifies this as the v17 ModelsBuilder breakage. Recommends one of two fixes: mass replace IPublishedSnapshotAccessor → IPublishedContentTypeCache across all *.generated.cs files (quick), or delete the generated files entirely, move Views out, get the site booting, then regenerate models from the DB (cleaner for larger sites). Mentions that the same replacement may be needed in custom (non-generated) C# code too. Points to modelsbuilder-fixes.md.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I bumped Umbraco.Community.Contentment to v17 and now in the backoffice all our Contentment-based data types show 'Property editor with alias ... is not found'. Nothing in the build output indicates a problem — site compiles and boots fine. What did I miss?",
+      "expected_output": "Identifies this as the Contentment v17 initialisation change — must now be called via `.AddContentment(...)` on the Umbraco builder in Program.cs. Provides the canonical Etch config with DisableTree=false, DisableTelemetry=true. Mentions this as the canonical example of 'updated packages may have different requirements' so the user develops the habit of checking package release notes for new init requirements.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Getting this warning during build, and the site is then erroring with 'No template exists to render the document at URL':\n\n```\nCSC : warning CS8785: Generator 'RazorSourceGenerator' failed to generate source. It will not contribute to the output and compilation errors may occur as a result. Exception was of type 'ArgumentException' with message 'The hintName 'Views_Partials_CookieBar_cshtml.g.cs' of the added source file must be unique within a generator. (Parameter 'hintName')'\n```\n\nHow do I fix it?",
+      "expected_output": "Identifies this as the duplicate hintName error caused by a project-local view duplicating one shipped by a NuGet package. Walks through identifying which file (Views/Partials/CookieBar.cshtml in this case — likely from Etch.Cms.Umbraco.Civic), checking the local project for it, and deleting the local copy. Mentions the rename-or-move alternative if the local customisation is intentional. Points to razor-source-generator-fix.md.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Working through the v17 Program.cs migration. We currently have a fairly minimal v13 Program.cs (just CreateUmbracoBuilder, AddBackOffice, AddWebsite, AddDeliveryApi, AddComposers, then Build, BootUmbracoAsync, UseUmbraco). What changes for v17? We use Contentment, CIVIC cookie banner, and the standard EtchCmsCore setup.",
+      "expected_output": "Walks through the v17 shape: add `.AddContentment(x => { x.DisableTree = false; x.DisableTelemetry = true; })` on the Umbraco builder chain, the `.AddEtchCmsCore(configure => ...)` block with ConfigureExamine excluding 'content', AddSitemap/AddListings/AddCivic/AddContentBlocks/AddStaticGeneration/AddMVC. ForwardedHeaders config. ApplicationInsights + OpenTelemetry with NotFoundTelemetryProcessor in non-dev. UseFrontEndSecurityHeaders with UnsafeInline kept for CIVIC. The /umbraco Referrer-Policy middleware for YouTube embeds. Points to program-cs-v17.md.",
+      "files": []
+    }
+  ]
+}

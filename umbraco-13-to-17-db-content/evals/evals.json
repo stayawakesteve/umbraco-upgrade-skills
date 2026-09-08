@@ -1,0 +1,71 @@
+{
+  "skill_name": "umbraco-13-to-17-db-content",
+  "evals": [
+    {
+      "id": 1,
+      "name": "template-import-order",
+      "prompt": "Just did a uSync import on a fresh v17 database and most of my templates didn't come through. Only the Layout template imported successfully. The rest of them show `result: false` in the uSync log with no exception. Backoffice now says 'No template exists to render the document at URL /'. What's happening?",
+      "assertions": [
+        "Identifies this as the master template ordering bug — templates with a Layout directive fail to import if the layout template doesn't exist in the DB yet",
+        "States this is specifically a fresh DB issue (not an issue when upgrading an existing v13 DB)",
+        "Provides the _layout.config fix — create a file with _ prefix so it sorts alphabetically before other templates and imports first",
+        "Provides or describes the XML structure for _layout.config (Alias=Layout, Level=1, empty Parent, fresh GUID)",
+        "References template-import-order.md by name in the response text"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "usync-export-workflow",
+      "prompt": "Working on the v13→v17 upgrade. The site is now compiling and booting against the v13 DB, ModelsBuilder is clean. I think I'm ready to start the uSync export step. What's the right order — what scripts do I need to run and when?",
+      "assertions": [
+        "States the first step is a full uSync export from v17 writing fresh files to uSync/v17/",
+        "Says to run transform-mntp-filter-udis-to-guids.ps1 after export (MNTP UDI to GUID transform) and that it only touches references inside <filters> sections",
+        "Mentions fixing nameTemplate AngularJS syntax to UFM in the exported uSync data type files",
+        "Includes the force-republish workaround as a step: delete home node + uSync re-import",
+        "Notes that fix-visible-property.ps1 should already have been run on v13 before this stage (pre-flight)",
+        "References usync-workflow.md by name in the response text"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "hubspot-form-picker",
+      "prompt": "The HubSpot Form Picker on our site stopped working after the v17 upgrade. The data type shows an error in the backoffice — something like 'property editor not available'. And on the frontend, pages that have form picker properties just don't render those properties at all. The form picker data types are imported from uSync. How do I fix this?",
+      "assertions": [
+        "Identifies this as a 3rd-party data type re-linkage issue — the package shipped a new property editor alias in v17 that the uSync config still references the old one",
+        "States the fix location: open the data type's .config file in uSync/v17/DataTypes/ and update the <EditorAlias> element",
+        "Notes the correct alias should be found in the package's v17 release notes / docs (don't guess)",
+        "Notes this is a general pattern that applies to other 3rd-party packages with alias renames, not just HubSpot Form Picker",
+        "References content-migration-gotchas.md by name in the response text"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "visible-blocks-post-upgrade",
+      "prompt": "Help — we deployed the v17 upgrade to staging and a bunch of blocks that should be visible are showing as hidden. Sections in the page builder that worked fine on v13 just don't render now. We've already done the full upgrade — site is on v17, content is in. Can we still fix this or do we need to roll back?",
+      "assertions": [
+        "Identifies this as the visible-state bug — v13 allowed \"visible\": \"\" (treated as visible), but v17 treats empty string as hidden",
+        "Acknowledges that the canonical pre-flight fix (fix-visible-property.ps1 on v13 before upgrade) was missed",
+        "Presents multiple options now they are on v17: manually toggle in backoffice, roll back to v13 and run the script, or write a v17-side equivalent",
+        "Recommends rolling back to v13 and running the script as the cleanest approach (unless rollback is impractical)",
+        "References content-migration-gotchas.md by name in the response text"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "content-rendering-bug",
+      "prompt": "Just kicked off the first boot of v17 against our v13 database. Frontend looks really weird — homepage on first load shows like 80% of what it should, then after a site restart it shows almost nothing, and I have to go to each page in the backoffice and manually re-publish to make it render. I have to do this for every page in the site? There's hundreds.",
+      "assertions": [
+        "Identifies this as the content-rendering bug after first v17 boot against a v13 DB — a known migration issue, not a config error",
+        "Confirms the manual page-by-page republish works but is impractical at scale",
+        "Provides the force-republish workaround: full uSync export, delete home node and clear from Recycle Bin, run uSync Import",
+        "Explains why this works better than re-publishing from root in backoffice (uSync recreates each node forcing individual save/republish; root republish doesn't reliably cascade)",
+        "References content-migration-gotchas.md by name in the response text"
+      ],
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "skill_name": "umbraco-13-to-17",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I've just been put on the [Client] site upgrade — moving it from Umbraco 13 to v17. Where do I start? This is a fairly standard Etch CMS site, nothing too custom. I have a fresh checkout of main on my machine.",
+      "expected_output": "Walks through the canonical sequence: pre-flight (run fix-visible-property.ps1 on v13 side, branch off main, package audit), then backend retarget, then ModelsBuilder rebuild + full uSync export, then DB/content migration (with the UDI→GUID transform and republish workaround), then backoffice/frontend, then verify. Should route to specific sub-skills for each stage rather than trying to explain everything inline. Should emphasise doing the v13-side visible-property fix BEFORE upgrading.",
+      "files": [],
+      "expectations": [
+        "Mentions running fix-visible-property.ps1 on the v13 side BEFORE branching or upgrading",
+        "Mentions creating a feature/v17 branch off main as part of pre-flight",
+        "Mentions package audit as a pre-flight step",
+        "Names or routes to umbraco-13-to-17-backend for the backend retarget step",
+        "Names or routes to umbraco-13-to-17-db-content for the DB/content migration step",
+        "Names or routes to umbraco-13-to-17-backoffice-frontend for the backoffice/frontend step",
+        "States that uSync export should happen AFTER the site compiles and boots (not before)",
+        "Presents the canonical upgrade order: pre-flight → backend → models+uSync export → DB/content → backoffice/frontend → verify"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm part way through the v17 upgrade. The site compiles now and boots, but content is rendering weirdly — homepage looks almost right at first then breaks. Also some blocks are showing as hidden that shouldn't be. What do I do?",
+      "expected_output": "Recognises this is mid-upgrade and should NOT restart from the beginning. Identifies two distinct symptoms: the content-rendering bug (workaround: delete home node + uSync re-import to force republish) and the visible-state bug (which needs the v13-side fix script, ideally before upgrade — if missed, options are manual toggle, rollback, or write a v17-side equivalent). Routes to umbraco-13-to-17-db-content for the detail.",
+      "files": [],
+      "expectations": [
+        "Does NOT restart from Step 0 or re-walk the full upgrade sequence from scratch",
+        "Identifies the content-rendering bug (homepage breaks) and recommends the force-republish workaround (delete home node + uSync re-import)",
+        "Identifies the visible-state bug (blocks showing as hidden) as a separate issue from the rendering bug",
+        "Mentions fix-visible-property.ps1 in the context of the visible-state bug and notes it should have been run on v13 before upgrading",
+        "Routes to umbraco-13-to-17-db-content for the detailed fix steps"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "We're planning the Umbraco upgrade for next sprint. Can you give me a rough sense of how the work splits up so I can estimate it? The site is Etch.Cms-based, currently on v13, target is v17.",
+      "expected_output": "Describes the three-track split: backend (csproj retarget to net10, packages, Program.cs, ModelsBuilder, RazorSourceGenerator fix), backoffice/frontend (tag helper rename, SCSS, RTE/TipTap config, BlockPreview, CSP), and DB/content (uSync export-fix-import dance with two PowerShell scripts, force-republish workaround, master template ordering trick). Mentions that step ordering matters (e.g. uSync export only after the site compiles and boots). Useful for estimation.",
+      "files": [],
+      "expectations": [
+        "Describes three distinct tracks: backend, backoffice/frontend, and DB/content",
+        "Backend track includes: .csproj retarget to net10.0, package updates, Program.cs changes, ModelsBuilder fix, and RazorSourceGenerator fix",
+        "Backoffice/frontend track includes: tag helper rename (our-X to etch-cms-X), SCSS changes, RTE/TipTap config, BlockPreview, and CSP",
+        "DB/content track includes: uSync export-fix-import dance with PowerShell scripts and the force-republish workaround",
+        "States that step ordering matters — specifically that uSync export only happens after site compiles and boots"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Quick question — for the v13 to v17 upgrade, can I just create the feature branch off main and start updating packages, or is there prep work I need to do first?",
+      "expected_output": "Surfaces the pre-flight work as critical: run fix-visible-property.ps1 on v13 main FIRST (before touching the upgrade branch), do a package audit to identify anything without v17 availability, then branch. Explains why the visible-property fix specifically must happen pre-upgrade (rolling back later is painful). Points to the pre-flight-checklist.md reference.",
+      "files": [],
+      "expectations": [
+        "Explicitly states that fix-visible-property.ps1 must be run BEFORE branching (on v13 main, not the upgrade branch)",
+        "Mentions package audit as required pre-flight work before starting the upgrade",
+        "Explains why the visible-property fix must happen pre-upgrade (painful or risky to backtrack to it later)",
+        "References pre-flight-checklist.md as the source for the full pre-flight list"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Done with the Umbraco upgrade — site builds, boots, all the content seems to migrate fine, RTE looks good. About to merge feature/v17 to main. Anything I should double-check before doing that?",
+      "expected_output": "Walks through the done-checklist concerns: build is clean with no RazorSourceGenerator warnings, all CS8785 warnings cleared, content visibility states correct, MNTP filter properties resolving, templates appearing (no fall-through to 404), backoffice info partials rendering, no remaining <our-X> tags, GetDictionaryValue replaced with GetDictionaryValueOrDefault, BlockPreview disabled for BlockList, CSP console-clean, YouTube embeds work in backoffice, Forms submit end-to-end. Points to done-checklist.md.",
+      "files": [],
+      "expectations": [
+        "References done-checklist.md or provides checks clearly derived from it",
+        "Mentions CS8785 RazorSourceGenerator hintName warnings must all be clear before merging",
+        "Mentions content visibility states must be verified (blocks/nodes correctly shown or hidden)",
+        "Mentions MNTP filter properties resolving correctly (UDI to GUID transform worked)",
+        "Mentions <our-X> tags — all migrated to <etch-cms-X> or none remaining",
+        "Mentions GetDictionaryValue must be replaced with GetDictionaryValueOrDefault",
+        "Mentions CSP console-clean check (no CSP errors on frontend)",
+        "Mentions BlockPreview disabled for BlockList"
+      ]
+    }
+  ]
+}
