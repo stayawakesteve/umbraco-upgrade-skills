@@ -6,15 +6,10 @@ keep the v13 versions (they'll break against v17 Forms APIs).
 
 ## What changes between v13 and v17 Forms templates
 
-The v17 templates have:
-
-- Updated HTML structure (some wrapper element changes)
-- New accessibility attributes
-- Tweaks to client-side validation hooks
-- Field type rendering adjustments for new field types
-
-Diffing a clean v17 install's `Views/Partials/Forms/Themes/default/` against the v13 versions shows
-the deltas. Most are small.
+The v17 templates typically have updated HTML structure (wrapper element changes), new
+accessibility attributes, tweaks to client-side validation hooks, and field-type rendering
+adjustments. Diffing a clean v17 install's `Views/Partials/Forms/Themes/default/` against the v13
+versions shows the deltas — most are small.
 
 ## The merge process
 

@@ -1,9 +1,5 @@
 # `.csproj` retargeting (v13 → v17)
 
-The target framework jumps from `net8.0` to `net10.0`. Packages change to v17-compatible versions
-(and the v17 template uses centralised package management, so versions live in
-`Directory.Packages.props`).
-
 ## Step 1: Retarget framework
 
 ```xml
@@ -23,7 +19,7 @@ Notes:
 
 ## Step 2: Drop `Version` attributes if centralising
 
-v17 template uses `Directory.Packages.props`. PackageReferences in `.csproj`:
+PackageReferences in `.csproj`:
 
 ```xml
 <PackageReference Include="Umbraco.Cms" />
@@ -45,7 +41,7 @@ No version. The version comes from `Directory.Packages.props` at the solution ro
 </Project>
 ```
 
-If the v13 solution doesn't have one, decide whether to introduce it now or migrate later. The v17
+If the v13 solution doesn't have one, decide whether to introduce it now (recommended) or migrate later. The v17
 Etch template *expects* it — keeping inline versions will work but creates drift.
 
 ## Step 3: The v17 package list (canonical)
@@ -65,6 +61,7 @@ the target shape — your site may add more, but it should at least include thes
 
 `Umbraco.Cms.DevelopmentMode.Backoffice` is new in v17 — it powers the dev-mode backoffice. Include
 it on dev/staging builds; can be conditionalised for production via `Condition="'$(Configuration)' != 'Release'"`.
+`Umbraco.Community.BlockPreview` was optional in v13, so some sites will need to add it.
 
 ### Umbraco AI suite (new in v17)
 
@@ -186,15 +183,3 @@ These haven't changed but are easy to miss when copying from the v17 template:
   <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
 </PropertyGroup>
 ```
-
-## What changes from v13
-
-The big diffs vs. a v13 `.csproj`:
-
-- `TargetFramework` `net8.0` → `net10.0`
-- New `Umbraco.AI.*` package family (entirely new in v17)
-- `Umbraco.Cms.DevelopmentMode.Backoffice` is new
-- `Umbraco.Community.BlockPreview` may be new for some v13 sites (was optional)
-- Version attributes likely removed in favour of `Directory.Packages.props`
-- Any custom v13 packages without a v17 release need to be dropped — these should have been flagged
-  in the package audit during pre-flight

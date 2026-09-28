@@ -1,23 +1,20 @@
 # Tag helpers migration (`<our-X>` → `<etch-cms-X>`)
 
-The Etch.Cms.TagHelpers package renamed its tag prefix from `our-` to `etch-cms-`. This is a
-project-wide rewrite that's mechanical but easy to miss instances of.
+The Etch.Cms.Umbraco.TagHelpers package renamed its tag prefix from `our-` to `etch-cms-` (the rename aligns
+the prefix with the package's actual ownership; `our-` was a holdover from the Umbraco community
+convention). This is a project-wide rewrite that's mechanical but easy to miss instances of.
 
 ## Step 1: Upgrade the package
 
-In the v17 `.csproj` (or `Directory.Packages.props`):
-
-```xml
-<PackageReference Include="Etch.Cms.Umbraco.TagHelpers" />
-```
-
-with the version pinned to the latest v17-compatible release. Old `our-` tags continue to work
-during a transitional period — the package supports both — but the convention going forward is
-`etch-cms-`.
+Make sure `Etch.Cms.Umbraco.TagHelpers` is on its latest v17-compatible release (updated with the
+rest of the `.csproj` in `umbraco-13-to-17-backend` → `references/csproj-net10-retarget.md`). Old
+`our-` tags continue to work during a transitional period — the package supports both — but the
+convention going forward is `etch-cms-`. Doing the find/replace as part of the upgrade is much
+easier than half-migrating later.
 
 ## Step 2: Find and replace
 
-Tag-by-tag, across all `.cshtml` files. The full list of renames in the current Etch.Cms.TagHelpers:
+Tag-by-tag, across all `.cshtml` files. The common renames:
 
 | v13 tag                   | v17 tag                        | Notes                                |
 |---------------------------|--------------------------------|--------------------------------------|
@@ -47,11 +44,10 @@ for closing tags.
 
 ## Step 3: `<etch-cms-img>` sizing parameters
 
-The image sizing API changed. Check current Etch.Cms.TagHelpers docs for the precise schema —
-this is the kind of thing that drifts between releases — but in general:
+The image sizing API changed. Check current Etch.Cms.Umbraco.TagHelpers docs for the precise schema —
+this is the kind of thing that drifts between releases — but v13 used:
 
-- v13 used `width-mobile`, `width-tablet`, `width-desktop` style attributes
-- v17 uses a more flexible attribute scheme
+- `width-mobile`, `width-tablet`, `width-desktop` style attributes
 
 Don't migrate from memory. **Find a single `<etch-cms-img>` you've already updated and confirm it
 renders correctly before doing a bulk migration**, otherwise you risk replicating a mistake across
@@ -78,9 +74,7 @@ Replace project-wide:
 
 This is one of those changes where the v13 behaviour was a bug-disguised-as-a-feature — pages would
 silently render empty for missing keys, which masked content gaps. The v17 behaviour is more honest
-but means any page with a typo'd dictionary key now displays "missing-key-typo" to end users. Hence:
-do this migration **before** any QA pass on the upgraded site, or QA will be full of false-positive
-"missing content" reports.
+but means any page with a typo'd dictionary key now displays "missing-key-typo" to end users.
 
 ## Step 5: `OurIMG` config (do not rename)
 
@@ -106,6 +100,7 @@ After the migration:
 
 1. Search the codebase for `our-` — any remaining `<our-…>` tags need migrating (or are intentional
    non-Etch tags using `our-` for other reasons; rare but possible)
-2. Search for `GetDictionaryValue(` — every match should be `GetDictionaryValueOrDefault(`
+2. Search for `GetDictionaryValue(` — there should be no matches (the `GetDictionaryValueOrDefault(` form
+   doesn't match this pattern)
 3. Spot-check 5+ pages on a running v17 site for correctly-rendered images, links, and dictionary
    values

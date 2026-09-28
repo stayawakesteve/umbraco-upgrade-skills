@@ -16,8 +16,7 @@ In the uSync log, failed templates appear as `result: false` with no exception.
 
 **Concrete example:** `Robots.cshtml` uses `Layout = null` — it imports fine. Every other
 template (e.g. `HomePage.cshtml`, `ContentPage.cshtml`) has `Layout = "Layout.cshtml"` — all of
-them fail silently with `result: false`. The fix below is required before any of those templates
-will import.
+them fail silently with `result: false`.
 
 ## Root cause
 
@@ -26,43 +25,20 @@ When uSync's `TemplateSerializer` imports a template, Umbraco's `TemplateService
 reference the master layout as `Layout = "Layout.cshtml"`. If the `Layout` template doesn't
 exist as an Umbraco template record in the database yet, the import fails.
 
-This is why only `Robots.cshtml` (or any other template with `Layout = null`) survives the
-initial import — the rest all depend on `Layout` being registered first.
-
-Because every content template typically shares a single master layout, this causes every template
-*except* those with `Layout = null` to fail on a clean install.
-
-The fix has to ensure the layout template is registered **before** any template that references it.
-
 ## The fix
 
-Add a uSync `.config` entry for the master layout template, named with a `_` prefix so it sorts
-before all other template configs and is imported first.
+Add a uSync `.config` entry for the master layout template, named with a `_` prefix: uSync processes
+files in alphabetical order within a folder and `_` sorts before any letter, so it is imported first
+and every later `Layout = "Layout.cshtml"` reference resolves.
 
-Create `uSync/v17/Templates/_layout.config`:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<Template Key="<new-guid>" Alias="Layout" Level="1">
-  <Name>Layout</Name>
-  <Parent />
-</Template>
-```
-
-Replace `<new-guid>` with a freshly-generated GUID. This is a deliberately **minimal** template
+Copy `assets/_layout.config` to `uSync/v17/Templates/_layout.config` and replace `<new-guid>` with a
+freshly-generated GUID. This is a deliberately **minimal** template
 config — just enough to register the template in Umbraco so subsequent imports can reference it.
 The full `.cshtml` content gets imported separately by the regular `Layout.config` file (which
 sorts alphabetically after `_layout.config`).
 
 The `Level="1"` indicates a root-level template. The `<Parent />` element is empty because the
 master layout has no parent template.
-
-## Why the `_` prefix works
-
-uSync processes files in alphabetical order within a folder. `_` sorts before any letter, so
-`_layout.config` is processed first. Once it runs, the `Layout` template exists in the database,
-and every subsequent template that does `Layout = "Layout"` can resolve its master template
-reference.
 
 ## When you need this fix
 

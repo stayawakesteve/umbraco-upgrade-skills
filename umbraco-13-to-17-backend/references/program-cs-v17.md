@@ -1,8 +1,5 @@
 # `Program.cs` (v17 shape)
 
-The v17 `Program.cs` looks broadly familiar but has several specific shape changes that catch people
-out. Use the v17 Etch.Cms template as the canonical reference, and pay attention to these specifics.
-
 ## Canonical structure
 
 ```csharp
@@ -45,13 +42,10 @@ var configuration = builder.Configuration;
 ### 1. `.AddContentment(...)` on the Umbraco builder
 
 This is new in v17. Without it, Contentment data types silently fail at runtime — the backoffice
-will show "Property editor with alias … not found" for any data type that uses Contentment.
+will show "Property editor with alias … not found" for any data type that uses Contentment. It's the
+most common source of "data type missing" errors after migration.
 
-The Etch standard config is:
-
-```csharp
-.AddContentment(x => { x.DisableTree = false; x.DisableTelemetry = true; });
-```
+The Etch standard options (as in the canonical structure above):
 
 - `DisableTree = false` — keep the Contentment tree visible in Settings
 - `DisableTelemetry = true` — opt out of usage telemetry
@@ -109,7 +103,8 @@ Items to verify when migrating from v13:
 
 ### 4. YouTube backoffice CSP middleware
 
-This is the fix for YouTube embeds in the backoffice TipTap RTE — add it after `UseFrontEndSecurityHeaders`:
+Without this, YouTube embeds in the backoffice TipTap RTE fail with a CSP/referrer error. Add it after
+`UseFrontEndSecurityHeaders`, otherwise the referrer override has no effect:
 
 ```csharp
 // Override referrer policy for backoffice to allow YouTube embeds
@@ -127,7 +122,6 @@ app.Use(async (context, next) =>
 });
 ```
 
-Without this, YouTube embeds fail with a CSP/referrer error in the backoffice TipTap editor.
 
 ### 5. ForwardedHeaders + ApplicationInsights + OpenTelemetry
 
@@ -157,7 +151,8 @@ else
 }
 ```
 
-`NotFoundTelemetryProcessor` filters 404s out of OpenTelemetry traces — comes from
+`NotFoundTelemetryProcessor` filters 404s out of OpenTelemetry traces (without it tracing still works but
+floods App Insights with 404 noise) — comes from
 `Etch.Cms.Umbraco.Core.Features.ApplicationInsights`. The OpenApi block runs only in dev so Swagger
 is available at `/swagger`.
 
@@ -214,12 +209,3 @@ await app.RunAsync();
 The `UseViteDevelopmentServer` placement is non-obvious — it has to be *after* `UseUmbraco()` or Vite
 HMR doesn't intercept correctly. There's a GitHub issue linked in the inline comment that explains
 why; preserve that comment when migrating.
-
-## Common migration mistakes
-
-- **Forgetting `AddContentment`** — most common source of "data type missing" errors after migration
-- **Wrong order of CSP middleware** — `UseFrontEndSecurityHeaders` must come before the backoffice
-  referrer middleware, or the referrer override has no effect
-- **Vite middleware in the wrong place** — see comment above
-- **`AddOpenTelemetry().WithTracing(...)` without the NotFoundTelemetryProcessor** — works but floods
-  App Insights with 404 noise

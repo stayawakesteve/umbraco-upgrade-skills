@@ -1,7 +1,6 @@
 # RTE / TipTap config (v17)
 
-v17 ships TipTap as the default rich text editor (replacing TinyMCE in v13). All RTE data types in
-the site need their configuration updated.
+v17 ships TipTap as the default rich text editor (replacing TinyMCE in v13).
 
 ## Per-RTE config to apply
 
@@ -80,7 +79,8 @@ need watching:
 - **Inline styles** were sometimes added by TinyMCE; TipTap is stricter. Editors may need to redo
   styling once.
 - **Embedded media** (YouTube, Twitter) embedded via TinyMCE oEmbed plugin: confirm they still
-  render. If not, see the YouTube CSP fix in `blocks-and-pickers.md`.
+  render. If not, see `umbraco-13-to-17-backend` → `references/program-cs-v17.md`, section "YouTube
+  backoffice CSP middleware".
 
 ## Verifying
 

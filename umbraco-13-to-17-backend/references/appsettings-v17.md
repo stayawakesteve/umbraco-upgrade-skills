@@ -1,52 +1,17 @@
 # `appsettings.json` (v17 conventions)
 
-Most of `appsettings.json` is unchanged from v13. This file documents the differences, the things
-worth verifying, and the canonical v17 shape for any sections that may need creating.
-
 ## Sections to verify exist / are correct
 
 ### `BlockPreview.BlockList.Enabled` = `false`
 
-This is a v17 default the upgrade should adopt:
-
-```json
-"BlockPreview": {
-  "BlockGrid": {
-    "Enabled": true,
-    "Stylesheet": "/css/blockpreview.css",
-    "ViewLocations": ["~/Views/Partials/blockgrid/Components/{0}.cshtml"]
-  },
-  "BlockList": {
-    "Enabled": false
-  }
-}
-```
-
-In v13, BlockPreview was often enabled for BlockList. In v17, it should be **off** for BlockList —
-the v17 backoffice has its own preview behaviour that fights with BlockPreview. Leaving it on
-causes weird double-render artifacts in the BlockList editor.
-
-The backoffice skill (`umbraco-13-to-17-backoffice`) covers this in more detail; this is
-just the config side.
+Must be `false` in v17 (BlockGrid stays enabled). The config block and the reason live in
+`umbraco-13-to-17-backoffice` → `references/blocks-and-pickers.md` §1.
 
 ### `Etch.Cms.Umbraco.TagHelpers.OurIMG`
 
-Despite the tag name moving from `<our-img>` to `<etch-cms-img>`, the **config section is still
-called `OurIMG`**. Confirmed in the v17 template:
-
-```json
-"Etch.Cms.Umbraco.TagHelpers": {
-  "OurIMG": {
-    "MobileFirst": true,
-    "UseNativeLazyLoading": true,
-    "ApplyAspectRatio": false,
-    "AlternativeTextMediaTypePropertyAlias": "altText"
-  }
-}
-```
-
-Don't try to "fix" this by renaming the key — the package looks for `OurIMG` and you'll break tag
-helper config if you change it.
+Keep the key named `OurIMG` despite the `<our-img>` → `<etch-cms-img>` rename, because the package
+looks it up by that name — renaming it breaks tag helper config. The config block is in
+`umbraco-13-to-17-frontend` → `references/taghelpers-migration.md` Step 5.
 
 ### `uSync.Publisher` settings
 
@@ -57,7 +22,7 @@ v17 uSync uses an `AppId` / `AppKey` pair instead of older auth styles:
   "Publisher": {
     "Settings": {
       "IncomingEnabled": true,
-      "AppId": "7a2ef374-1017-4691-abbf-fac1716f8e74",
+      "AppId": "<unique-guid-per-environment>",
       "AppKey": "!!! Use dotnet user-secrets !!!"
     }
   },

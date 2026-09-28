@@ -17,8 +17,7 @@ This is because Umbraco 17 removed `IPublishedSnapshotAccessor` and the pre-exis
 Find: `IPublishedSnapshotAccessor`
 Replace: `IPublishedContentTypeCache`
 
-Apply across all `*.generated.cs` files in the Models project. Most editors can do this with a
-project-wide find/replace.
+Apply across all `*.generated.cs` files in the Models project.
 
 **When to choose this:**
 - Smaller sites (under ~50 doc types)

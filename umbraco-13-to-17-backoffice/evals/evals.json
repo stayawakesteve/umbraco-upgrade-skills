@@ -28,14 +28,14 @@
     {
       "id": 3,
       "prompt": "We have a Block Grid data type on the site with about 20 block configurations. Each one has a label like `{{ heading }}` or `{{ value | ncNodeName }}`. After the v17 upgrade those labels are showing the raw template syntax instead of values in the backoffice. What's the new format?",
-      "expected_output": "Identifies this as the AngularJS → UFM (Umbraco Flavored Markdown) template syntax change. Provides the mapping: `{{ heading }}` → `{$heading}` or `{heading}`, `{{ value | ncNodeName }}` → `{umbContentName: value}`. Mentions this can be done either in the backoffice UI per data type OR by mass-editing the uSync data type config files (recommends the latter for 20 blocks). Notes the equivalent rewrite is needed in uSync nameTemplate fields, cross-references the database skill. Points to blocks-and-pickers.md and the nametemplate-rewrite.md in the database skill.",
+      "expected_output": "Identifies this as the AngularJS → UFM (Umbraco Flavored Markdown) template syntax change. Provides the mapping: `{{ heading }}` → `{$heading}` or `{heading}`, `{{ value | ncNodeName }}` → `{umbContentName: value}`. Mentions this can be done either in the backoffice UI per data type OR by mass-editing the uSync data type config files (recommends the latter for 20 blocks). Notes the equivalent rewrite is needed in uSync nameTemplate fields, cross-references the database skill. Points to nametemplate-rewrite.md in the database skill.",
       "files": [],
       "expectations": [
         "Identifies this as the AngularJS to UFM (Umbraco Flavored Markdown) label template syntax change",
         "Provides the mapping: {{ heading }} becomes {$heading} or {heading}",
         "Provides the mapping: {{ value | ncNodeName }} becomes {umbContentName: value}",
         "Mentions that mass-editing the uSync data type config files is an option (and preferable for 20 blocks)",
-        "References blocks-and-pickers.md"
+        "References nametemplate-rewrite.md (in the database skill)"
       ]
     },
     {

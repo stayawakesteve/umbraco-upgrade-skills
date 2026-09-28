@@ -7,20 +7,10 @@ later — most of them are quick to do now, painful to backtrack to.
 
 ### 1. Fix the `"visible": ""` content bug
 
-In v13, blocks with a visible state of `""` or `"1"` both render correctly. After the v17 migration,
-`""` is treated as **hidden**. Mass-replace before exporting:
-
-```powershell
-# From the project root, on the v13 main branch
-.\Scripts\fix-visible-property.ps1
-```
-
-The script lives in `umbraco-13-to-17-database/scripts/fix-visible-property.ps1`. It targets
-`uSync\v9\Content` — that hardcoded path is correct for our setup despite the version number; check
-your project's folder before running.
-
-After running, re-import uSync content on the v13 side and commit. This ensures every block has an
-explicit `"1"` or `"0"`.
+v17 treats `"visible": ""` as **hidden**, so this must be fixed in the v13 data before export; after
+the v17 import is too late. Run `fix-visible-property.ps1` on v13 `main`, re-import uSync on v13, then
+commit. Root cause, script location and target-folder caveat: `umbraco-13-to-17-database` →
+`references/content-migration-gotchas.md` §1.
 
 ### 2. Decide on the feature branch model
 
@@ -35,7 +25,8 @@ just letting `feature/v17` diverge until it's ready to merge.
 Open the v13 `.csproj` and for each `PackageReference`:
 
 1. Check the package's NuGet page for a v17-compatible release.
-2. For packages with no v17 release, decide *now*: drop, replace, or block the upgrade. Common cases:
+2. For packages with no v17 release, decide *now*: drop, replace, or block the upgrade. There's no
+   point retargeting the project if you'll be ripping out three packages anyway. Common cases:
    - **Dropped:** anything Umbraco-specific that the author abandoned
    - **Replaced:** community packages where a newer alternative emerged (e.g. some image processors)
    - **Block:** rare, but if a critical package has no v17 path, the upgrade can't proceed yet
@@ -66,16 +57,10 @@ build at it. The v17 boot will perform schema migrations that cannot be reversed
 
 ### 7. PowerShell available
 
-The two fix scripts (`fix-visible-property.ps1`, `transform-mntp-filter-udis-to-guids.ps1`) are
-PowerShell, not bash. Make sure whoever's running the upgrade has PowerShell installed.
+The fix scripts in `umbraco-13-to-17-database/scripts/` are PowerShell, not bash. Make sure whoever's running the upgrade has PowerShell installed.
 
 ### 8. ModelsBuilder strategy
 
-Decide upfront which path to take when `IPublishedSnapshotAccessor` references break the build:
-
-- **Option A:** Mass-replace `IPublishedSnapshotAccessor` with `IPublishedContentTypeCache` across
-  all `*.generated.cs` files. Quick, keeps history.
-- **Option B:** Delete all generated files, temporarily move Views out of the project, get the site
-  booting, then rebuild models from the DB and put Views back. Cleaner end state, more steps.
-
-Option B is generally less painful for larger sites.
+Decide upfront which fix you'll use when `IPublishedSnapshotAccessor` references break the build —
+mass-replace in the generated files, or delete and regenerate. The options and when to pick each are
+in `umbraco-13-to-17-backend/references/modelsbuilder-fixes.md`.

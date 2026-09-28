@@ -1,7 +1,5 @@
 # Content migration gotchas
 
-The weird content-side bugs that catch every v13 → v17 upgrade. Each has a known workaround.
-
 ## 1. The "visible state" bug
 
 **Symptom:** After migration, blocks that were visible on v13 render as hidden on v17. Common
@@ -15,8 +13,9 @@ example: nav items disappear, sidebar widgets vanish, hero sections don't show.
 In v17, `""` is treated as hidden. So any v13 block with `"visible": ""` migrates to a hidden state.
 
 **Fix:** Run the v13-side `fix-visible-property.ps1` script **before** starting the upgrade.
-Targets `uSync\v9\Content` (or wherever the v13 uSync content lives), replaces `"visible": ""` with
-`"visible": "1"`, then re-import uSync on v13 and commit.
+Targets `uSync\v9\Content` (hardcoded; the folder name is historical — confirm it matches where your
+v13 uSync content lives before running), replaces `"visible": ""` with `"visible": "1"`, then
+re-import uSync on v13 and commit.
 
 This is a **pre-flight** fix, not a post-upgrade fix. If you missed it and you're already on v17,
 your options are:
@@ -39,13 +38,8 @@ The pre-flight approach is by far the cleanest.
 **Root cause:** Something in the v17 migration pipeline is leaving published content in a stale
 state. Re-saving each node forces it to re-publish into the v17 schema.
 
-**Workaround:** Force a republish of every node by going through uSync:
-
-1. Full uSync export from v17 (capture current state)
-2. **Delete the home node** in the backoffice and clear it from the Recycle Bin
-3. Run uSync **Import** — this recreates the home node and every descendant, which forces
-   save/republish on every single one
-4. Verify the site renders correctly afterwards
+**Workaround:** force a republish of every node by deleting the home node and re-importing via
+uSync — steps in `usync-workflow.md` Step 5.
 
 This is heavy-handed but reliable. The manual alternative — re-publishing each page through the
 backoffice — works on small sites but is impractical on anything with 100+ pages.
@@ -62,17 +56,13 @@ backoffice. Properties using that data type don't render on the frontend.
 **Root cause:** The 3rd-party package shipped a new property editor alias in its v17 release.
 Existing data types still reference the old alias.
 
-**Canonical example: HubSpot Form Picker.** v13 used one alias; v17 uses a different one. The data
-type uSync file needs updating.
+**Canonical example:** HubSpot Form Picker.
 
-**Fix:**
+**Fix:** update the data type's `<EditorAlias>` in its uSync `.config` to the new alias and
+re-import — steps in `usync-workflow.md` Step 3.
 
-1. Open `uSync/v17/DataTypes/<datatype-name>.config`
-2. Find the `<EditorAlias>` element
-3. Replace the old alias with the new one (consult the package's release notes)
-4. Re-import uSync
-
-After re-import, the data type resolves correctly and properties using it render.
+After re-import, the data type resolves correctly. Fixing it usually fixes the frontend content too,
+though sometimes the property values themselves need migrating (depends on the package).
 
 **Discovery process for unknown packages:** Open the package's NuGet release notes for v17 — they
 usually call out alias renames. If not documented, install the package on a fresh v17 site and
@@ -97,10 +87,8 @@ against the configured aliases **case-sensitively**, so `SortOrder` no longer ma
 It affects *every* migrated List View data type, not just Media — you'd hit it on Content, Members,
 News Index, etc. as soon as you open each list.
 
-**Fix:** Run the v17-side `fix-listview-orderby-casing.ps1` script after export, before re-import.
-It walks `uSync\v17\DataTypes`, re-cases each `orderBy` value to match a configured or system alias,
-applies the one legacy rename (`VersionDate` → `updateDate`), and reports each change. Then re-import
-the data types (or restart the site if you have a startup import).
+**Fix:** run `fix-listview-orderby-casing.ps1` after export, before re-import (or restart the site if
+you have a startup import) — steps in `usync-workflow.md` Step 2.
 
 ## Cross-cutting principle
 

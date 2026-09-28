@@ -1,8 +1,7 @@
-# SCSS and partials migration
+# Backoffice SCSS migration
 
-The v17 backoffice SCSS changes are the cosmetic side of the upgrade. Most are mechanical
-— bring across a file, update imports, move some styles to a different location. None are hard
-individually; the gotcha is forgetting one and shipping a half-styled site.
+None of these changes is hard individually; the gotcha is forgetting one and shipping a half-styled
+site.
 
 ## 1. `blockpreview.scss`
 
@@ -10,42 +9,13 @@ Import the latest `blockpreview.scss` file from the v17 Etch.Cms template and up
 within it to match the project's structure.
 
 Typical location: `wwwroot/css/src/blockpreview.scss` (or wherever the source SCSS lives in the
-project). The compiled output should land at `/css/blockpreview.css` to match the `appsettings.json`
-config:
+project). The compiled output should land at `/css/blockpreview.css`, matching
+`BlockPreview:BlockGrid:Stylesheet` in `appsettings.json` (see `blocks-and-pickers.md` §1).
 
-```json
-"BlockPreview": {
-  "BlockGrid": {
-    "Stylesheet": "/css/blockpreview.css"
-  }
-}
-```
+If the project doesn't have a `blockpreview.scss` file yet (some v13 sites didn't bother), copy it in
+fresh from the v17 template instead of trying to update imports in a file that doesn't exist.
 
-If the project doesn't have a `blockpreview.scss` file yet (some v13 sites didn't bother), copy it
-in fresh from the v17 template.
-
-## 2. Section partials
-
-Section partials live at `Views/Partials/blockgrid/Components/Section.cshtml` (and related). Bring
-them up to v17 standards by including the **backoffice info partial** if it's missing — v17
-backoffice expects it. (The nested-section rendering fix in `SectionContent.cshtml` is a frontend
-change — see `umbraco-13-to-17-frontend` → `references/views-and-csp.md`.)
-
-### Including backoffice info partial
-
-Each section partial should include something like:
-
-```cshtml
-@if (Context.Request.Path.StartsWithSegments("/umbraco"))
-{
-    <partial name="blockgrid/Components/BackofficeInfo" model="Model" />
-}
-```
-
-Older Etch.Cms sites may not have this — without it, editors see less context about the section in
-the backoffice. Apply to all block partials, not just sections.
-
-## 3. Backoffice info SCSS
+## 2. Backoffice info SCSS
 
 If the v13 site had a `_color.scss` (or similar) defining backoffice info colour variables, those
 need migrating into the v17 backoffice info styles.
@@ -57,13 +27,7 @@ Migration steps:
 3. Migrate the colour *values* (not the variable names — the v17 version uses different names) into
    the v17 SCSS
 
-### Ensure backoffice info SCSS is rendering correctly
-
-After migration, load a content page in the backoffice and confirm the backoffice info blocks render
-with the right colours. If they look wrong (default-grey, no theme colour), the SCSS isn't being
-included — check the bundle config.
-
-## 4. `.stylelintcache` in `.gitignore`
+## 3. `.stylelintcache` in `.gitignore`
 
 v17 brings in stylelint at the project level. Add `.stylelintcache` to `.gitignore`:
 
@@ -75,19 +39,12 @@ v17 brings in stylelint at the project level. Add `.stylelintcache` to `.gitigno
 Cheap but easy to forget — if you don't add it, every developer ends up committing their local
 stylelint cache file.
 
-## 5. Picker styles migration
+## 4. Picker styles migration
 
-In v13, picker styles often lived in `editor.scss` (alongside other backoffice editor styles). In
-v17, picker styles need to move to:
+In v13, picker styles often lived in `editor.scss`. In v17 they move to the SCSS that compiles to the
+assets referenced by `App_Plugins/Etch.Cms.Umbraco/umbraco-package.json`. The mechanics depend on how the picker is implemented; check the v17 template for the current pattern.
 
-```
-App_Plugins/Etch.Cms.Umbraco/umbraco-package.json
-```
-
-…or rather, the SCSS that compiles to assets referenced by that `umbraco-package.json`. The
-mechanics depend on how the picker is implemented; check the v17 template for the current pattern.
-
-## 6. Remove `.umb-block-grid` styles from `editor.scss`
+## 5. Remove `.umb-block-grid` styles from `editor.scss`
 
 In v13, `.umb-block-grid` styling was custom in `editor.scss`. In v17, those styles ship as part
 of the Etch CMS Umbraco backoffice package, at:
@@ -106,5 +63,6 @@ After all SCSS / partial work:
 1. Run the SCSS build and confirm `blockpreview.css` is produced
 2. Load the backoffice and check:
    - Block grid editor renders correctly
-   - Backoffice info partials show with correct colours
+   - Backoffice info partials show with correct colours. If they're default-grey with no theme colour,
+     the SCSS isn't being included: check the bundle config.
    - Pickers render with correct styling

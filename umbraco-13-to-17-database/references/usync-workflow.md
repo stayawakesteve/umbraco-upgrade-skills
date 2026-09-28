@@ -24,38 +24,27 @@ before continuing (usually a specific data type is causing issues; check the log
 
 ### UDI → GUID for MNTP filters
 
+The custom repository-based MNTP property editor stored node references as Umbraco UDIs
+(`umb://document/<32-char-hex>`) in v13. The v17 document picker uses plain GUIDs in dashed format
+(`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`).
+
 ```powershell
 .\scripts\transform-mntp-filter-udis-to-guids.ps1
 ```
 
 The script targets `uSync\v17\Content` (hardcoded path — confirm yours matches before running).
-It only touches references inside `<filters>...</filters>` sections; other UDI references are left
-alone.
-
-After running, you'll see output like:
-
-```
-Modified: HomePage.config - 3 UDI(s) transformed
-Modified: AboutPage.config - 1 UDI(s) transformed
-Processing complete!
-```
+It only touches references inside `<filters>...</filters>` sections; other UDI references (e.g. for
+content pickers using the standard editor) must be left alone.
 
 Spot-check a few of the modified files to confirm the transformation looks right — the regex
 expects 32-char hex UDIs, so anomalous inputs (e.g. broken UDIs in the source data) may not match.
+If MNTP filters still return no results, check the filter uses the repository-based MNTP — the
+standard MNTP isn't affected.
 
 ### `nameTemplate` UFM rewrite
 
-This isn't a bundled script (it's small enough to do by hand or with a one-liner). See
-`references/nametemplate-rewrite.md` for the regex patterns. The short version:
-
-```
-Find:    "nameTemplate":\s*"\{\{\s*value\s*\|\s*ncNodeName\s*\}\}"
-Replace: "nameTemplate": "{umbContentName: value}"
-```
-
-…plus similar patterns for other AngularJS template helpers. Doing this *in the uSync files* (rather
-than in the backoffice after import) is faster because you can mass-replace across all data types
-at once.
+Not a bundled script — see `references/nametemplate-rewrite.md` for the find/replace patterns and the
+recommended files-then-backoffice approach.
 
 ### List View `orderBy` casing
 
@@ -65,9 +54,7 @@ at once.
 
 The script targets `uSync\v17\DataTypes` (hardcoded path — confirm yours matches before running).
 It re-cases each List View `orderBy` value to match a configured alias (`SortOrder` → `sortOrder`)
-and renames the legacy `VersionDate` to `updateDate`. Without it, opening the Media library (and
-every other migrated List View) throws "Order by value is not a property on the configured
-collection".
+and renames the legacy `VersionDate` to `updateDate`.
 
 Any line reported as `Skipped` is an `orderBy` the script couldn't match to a known alias — check
 those data types by hand. See `references/content-migration-gotchas.md` §4 for the full background.
@@ -80,8 +67,6 @@ example):
 1. Open `uSync/v17/DataTypes/<datatype-name>.config`
 2. Find the `<EditorAlias>` element
 3. Update to the new alias (consult the package's v17 docs for the correct alias)
-
-Save and continue.
 
 ## Step 4: Re-import
 
@@ -107,9 +92,6 @@ This step works around the content-not-rendering bug after migration. See
    descendant
 4. Verify pages render correctly on the frontend
 
-This is the heavy-handed "nuke and restore" approach. It's reliable; manual page-by-page republishing
-is unreliable on a large site.
-
 ## Step 6: Final commit
 
 Once everything imports cleanly and the site renders correctly:
@@ -118,18 +100,6 @@ Once everything imports cleanly and the site renders correctly:
 2. Commit the `uSync/v17/` folder to the `feature/v17` branch
 3. The `uSync/v9/` (or older) folder can stay until the upgrade is merged — useful reference during
    code review
-
-## What can go wrong
-
-- **Export step errors** — usually a specific data type. Look at the log, fix the data type, re-export.
-- **Import errors but no obvious cause** — uSync logs `result: false` without an exception. Check
-  the dependency order; templates with `Layout` directives need their layout imported first.
-- **Content imports but renders empty** — the content-rendering bug. Do the delete-home workaround.
-- **Visible state wrong** — you forgot to run the v13-side fix script before exporting. Roll back
-  to v13, run the script, commit, then redo the upgrade.
-- **MNTP filters return no results** — the UDI → GUID transform didn't run, or the filter is using
-  the standard MNTP (not the repository-based one). The script only fixes filters inside
-  `<filters>...</filters>` sections.
 
 ## Verifying
 

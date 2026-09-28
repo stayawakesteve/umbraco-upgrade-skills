@@ -17,13 +17,12 @@ collision.
 
 In v13, Razor compilation worked differently and would silently use one or the other (usually the
 project-local file). In v17, the new source-generator-based Razor compilation refuses to disambiguate
-— it errors out, and the warning above is non-fatal but it does mean that view ends up not being
+— the generator throws, which surfaces only as the non-fatal warning above, but that view is not
 generated, which usually cascades into runtime "template not found" errors.
 
 ## The fix
 
-Find which file is the source of the collision, then **delete the project-local copy**. The version
-from the NuGet package is the canonical one — your project is duplicating it (usually because
+The version from the NuGet package is the canonical one — your project is duplicating it (usually because
 someone copied a partial out of a package to override it long ago, then never cleaned up).
 
 ### Step 1: Identify the offending file
@@ -45,8 +44,9 @@ Check whether your project has that file. If it does:
 
 ### Step 3: Delete the local file
 
-Delete the project-local file. **Don't** delete the one in the NuGet package — that's the canonical
-copy and gets restored on every build.
+Check git blame first — if the local copy is a deliberate customisation that's still needed, go to
+"When you actually want to override the package's view" instead. Otherwise, delete the project-local
+file. **Don't** delete the one in the NuGet package — it gets restored on every build.
 
 After deletion, rebuild. The warning should go away.
 
@@ -57,11 +57,6 @@ In Etch.Cms v17 the views most likely to clash are partials that ship with packa
 - `Views/Partials/CookieBar.cshtml` — ships with `Etch.Cms.Umbraco.Civic`
 - `Views/Partials/Forms/...` — ships with `Umbraco.Forms`
 - `Views/Partials/sitemap.cshtml` — ships with `Etch.Cms.Umbraco.Sitemap`
-
-If you find one of these as a local file in your project, it was likely copied out for a
-customisation that may no longer be needed. Check git blame for context before deleting — if the
-customisation *is* still needed, you'll need to fork the package or override differently rather than
-just deleting.
 
 ## When you actually want to override the package's view
 

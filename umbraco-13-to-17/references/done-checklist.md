@@ -35,7 +35,7 @@ into `main`.
 
 - [ ] No `<our-X>` tags remain — all migrated to `<etch-cms-X>` (or knowingly left)
 - [ ] `@Umbraco.GetDictionaryValue` calls all migrated to `GetDictionaryValueOrDefault`
-- [ ] `<etch-cms-img>` sizing parameters match current Etch.Cms.TagHelpers docs
+- [ ] `<etch-cms-img>` sizing parameters match current Etch.Cms.Umbraco.TagHelpers docs
 - [ ] Nested sections render without extra wrapper divs
 
 ## CSP / security

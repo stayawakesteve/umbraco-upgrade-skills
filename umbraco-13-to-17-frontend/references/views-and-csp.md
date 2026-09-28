@@ -1,8 +1,5 @@
 # Views and frontend CSP
 
-The frontend fixes that don't fit cleanly into "tag helpers" or "Umbraco Forms". Small, but each
-one shows up as a visible bug on the live site if missed.
-
 ## 1. Nested section frontend bug
 
 In v17, sections nested inside other sections render with extra wrapper markup that breaks the
@@ -14,25 +11,14 @@ already inside another section. Don't try to recreate from memory — copy from 
 
 ## 2. CIVIC cookie banner still needs `unsafe-inline` style-src
 
-The site's CSP needs to keep `style-src 'unsafe-inline'` for the CIVIC Cookie Control widget to
-render. In `Program.cs`:
-
-```csharp
-app.UseFrontEndSecurityHeaders(configureCsp: builder =>
-    // UnsafeInline required for CIVIC
-    builder.AddStyleSrc()
-        .UnsafeInline()
-        .OverHttps()
-        .Self());
-```
+The site's CSP must keep `style-src 'unsafe-inline'` for the CIVIC Cookie Control widget to render.
+The `UseFrontEndSecurityHeaders` block, with its `// UnsafeInline required for CIVIC` comment, lives
+in `Program.cs` — see `umbraco-13-to-17-backend` → `references/program-cs-v17.md`. It's listed here
+because the symptom (a missing or unstyled cookie banner) is visitor-facing.
 
 Keep the inline comment — without it, the next person tightening CSP will remove `UnsafeInline`
 and break the cookie banner. Tightening CSP further requires moving CIVIC styles into a CSP-friendly
 configuration, which is a separate piece of work.
-
-The code lives in `Program.cs`, so the full context is in `umbraco-13-to-17-backend` →
-`references/program-cs-v17.md`. It's listed here because the symptom (a missing or unstyled cookie
-banner) is visitor-facing.
 
 ## Verifying
 

@@ -15,45 +15,17 @@ Anywhere a template string uses AngularJS expressions like `{{ ... }}` with help
 
 ## The transformation
 
-### Plain property reference
-
-**v13 (AngularJS):**
-```
-{{ heading }}
-```
-
-**v17 (UFM):**
-```
-{$heading}
-```
-
-The `$` prefix references a property.
-
-### `ncNodeName` helper
-
-**v13:**
-```
-{{ value | ncNodeName }}
-```
-
-**v17:**
-```
-{umbContentName: value}
-```
-
-The UFM equivalent of the AngularJS `ncNodeName` filter is `umbContentName:`.
-
-### Other common AngularJS filters
-
 | AngularJS                       | UFM                          |
 |---------------------------------|------------------------------|
-| `{{ value }}`                   | `{$value}` or `{value}`      |
+| `{{ heading }}`                 | `{$heading}` or `{heading}`  |
 | `{{ value | ncNodeName }}`      | `{umbContentName: value}`    |
 | `{{ value | take:50 }}`         | `{value:take:50}`            |
 | `{{ value or 'fallback' }}`     | `{$value:fallback('fallback')}` |
 
-UFM has its own filter syntax; consult the Umbraco UFM docs for the full list. The point is:
-don't try to map filter-by-filter from memory — get the syntax from the docs.
+The `$` prefix references a property.
+
+UFM has its own filter syntax — get each filter from the Umbraco UFM docs rather than mapping
+filter-by-filter from memory.
 
 ## Doing the rewrite
 
