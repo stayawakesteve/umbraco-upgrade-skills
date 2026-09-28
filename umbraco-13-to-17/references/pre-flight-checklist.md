@@ -15,7 +15,7 @@ In v13, blocks with a visible state of `""` or `"1"` both render correctly. Afte
 .\Scripts\fix-visible-property.ps1
 ```
 
-The script lives in `umbraco-13-to-17-db-content/scripts/fix-visible-property.ps1`. It targets
+The script lives in `umbraco-13-to-17-database/scripts/fix-visible-property.ps1`. It targets
 `uSync\v9\Content` — that hardcoded path is correct for our setup despite the version number; check
 your project's folder before running.
 

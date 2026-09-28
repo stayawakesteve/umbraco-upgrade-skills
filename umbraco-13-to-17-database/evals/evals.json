@@ -1,5 +1,5 @@
 {
-  "skill_name": "umbraco-13-to-17-db-content",
+  "skill_name": "umbraco-13-to-17-database",
   "evals": [
     {
       "id": 1,
@@ -63,6 +63,20 @@
         "Confirms the manual page-by-page republish works but is impractical at scale",
         "Provides the force-republish workaround: full uSync export, delete home node and clear from Recycle Bin, run uSync Import",
         "Explains why this works better than re-publishing from root in backoffice (uSync recreates each node forcing individual save/republish; root republish doesn't reliably cascade)",
+        "References content-migration-gotchas.md by name in the response text"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "listview-orderby-casing",
+      "prompt": "After the v17 upgrade, going to the Media library throws a toast error: 'Order by value is not a property on the configured collection / The specified orderBy property is not part of the collection configuration'. Nothing shows in the Umbraco logs. What's going on?",
+      "assertions": [
+        "Identifies this as the List View orderBy casing bug — the v14 migration lower-cased the config keys and property aliases to camelCase but left the orderBy value in v13 PascalCase (e.g. SortOrder vs sortOrder)",
+        "Explains v17 validates orderBy against the configured aliases case-sensitively, so the mismatch fails",
+        "Notes it's a client-side validation error, which is why nothing appears in the Umbraco logs",
+        "Notes it affects every migrated List View data type, not just Media",
+        "Provides the fix: run fix-listview-orderby-casing.ps1 against uSync/v17/DataTypes, then re-import (including the VersionDate to updateDate legacy rename)",
         "References content-migration-gotchas.md by name in the response text"
       ],
       "files": []

@@ -4,41 +4,42 @@
     {
       "id": 1,
       "prompt": "I've just been put on the [Client] site upgrade — moving it from Umbraco 13 to v17. Where do I start? This is a fairly standard Etch CMS site, nothing too custom. I have a fresh checkout of main on my machine.",
-      "expected_output": "Walks through the canonical sequence: pre-flight (run fix-visible-property.ps1 on v13 side, branch off main, package audit), then backend retarget, then ModelsBuilder rebuild + full uSync export, then DB/content migration (with the UDI→GUID transform and republish workaround), then backoffice/frontend, then verify. Should route to specific sub-skills for each stage rather than trying to explain everything inline. Should emphasise doing the v13-side visible-property fix BEFORE upgrading.",
+      "expected_output": "Walks through the canonical sequence: pre-flight (run fix-visible-property.ps1 on v13 side, branch off main, package audit), then backend retarget, then ModelsBuilder rebuild + full uSync export, then DB/content migration (with the UDI→GUID transform and republish workaround), then backoffice and frontend (can run in parallel), then verify. Should route to specific sub-skills for each stage rather than trying to explain everything inline. Should emphasise doing the v13-side visible-property fix BEFORE upgrading.",
       "files": [],
       "expectations": [
         "Mentions running fix-visible-property.ps1 on the v13 side BEFORE branching or upgrading",
         "Mentions creating a feature/v17 branch off main as part of pre-flight",
         "Mentions package audit as a pre-flight step",
         "Names or routes to umbraco-13-to-17-backend for the backend retarget step",
-        "Names or routes to umbraco-13-to-17-db-content for the DB/content migration step",
-        "Names or routes to umbraco-13-to-17-backoffice-frontend for the backoffice/frontend step",
+        "Names or routes to umbraco-13-to-17-database for the DB/content migration step",
+        "Names or routes to umbraco-13-to-17-backoffice and umbraco-13-to-17-frontend for the backoffice and frontend steps",
         "States that uSync export should happen AFTER the site compiles and boots (not before)",
-        "Presents the canonical upgrade order: pre-flight → backend → models+uSync export → DB/content → backoffice/frontend → verify"
+        "Presents the canonical upgrade order: pre-flight → backend → models+uSync export → DB/content → backoffice + frontend → verify"
       ]
     },
     {
       "id": 2,
       "prompt": "I'm part way through the v17 upgrade. The site compiles now and boots, but content is rendering weirdly — homepage looks almost right at first then breaks. Also some blocks are showing as hidden that shouldn't be. What do I do?",
-      "expected_output": "Recognises this is mid-upgrade and should NOT restart from the beginning. Identifies two distinct symptoms: the content-rendering bug (workaround: delete home node + uSync re-import to force republish) and the visible-state bug (which needs the v13-side fix script, ideally before upgrade — if missed, options are manual toggle, rollback, or write a v17-side equivalent). Routes to umbraco-13-to-17-db-content for the detail.",
+      "expected_output": "Recognises this is mid-upgrade and should NOT restart from the beginning. Identifies two distinct symptoms: the content-rendering bug (workaround: delete home node + uSync re-import to force republish) and the visible-state bug (which needs the v13-side fix script, ideally before upgrade — if missed, options are manual toggle, rollback, or write a v17-side equivalent). Routes to umbraco-13-to-17-database for the detail.",
       "files": [],
       "expectations": [
         "Does NOT restart from Step 0 or re-walk the full upgrade sequence from scratch",
         "Identifies the content-rendering bug (homepage breaks) and recommends the force-republish workaround (delete home node + uSync re-import)",
         "Identifies the visible-state bug (blocks showing as hidden) as a separate issue from the rendering bug",
         "Mentions fix-visible-property.ps1 in the context of the visible-state bug and notes it should have been run on v13 before upgrading",
-        "Routes to umbraco-13-to-17-db-content for the detailed fix steps"
+        "Routes to umbraco-13-to-17-database for the detailed fix steps"
       ]
     },
     {
       "id": 3,
       "prompt": "We're planning the Umbraco upgrade for next sprint. Can you give me a rough sense of how the work splits up so I can estimate it? The site is Etch.Cms-based, currently on v13, target is v17.",
-      "expected_output": "Describes the three-track split: backend (csproj retarget to net10, packages, Program.cs, ModelsBuilder, RazorSourceGenerator fix), backoffice/frontend (tag helper rename, SCSS, RTE/TipTap config, BlockPreview, CSP), and DB/content (uSync export-fix-import dance with two PowerShell scripts, force-republish workaround, master template ordering trick). Mentions that step ordering matters (e.g. uSync export only after the site compiles and boots). Useful for estimation.",
+      "expected_output": "Describes the four-track split: backend (csproj retarget to net10, packages, Program.cs, ModelsBuilder, RazorSourceGenerator fix), DB/content (uSync export-fix-import dance with the PowerShell fix scripts, force-republish workaround, master template ordering trick), backoffice (RTE/TipTap config, BlockPreview, UFM block labels, backoffice info SCSS, YouTube CSP), and frontend (tag helper rename, dictionary helper change, nested-section fix, Umbraco Forms template merge). Mentions that step ordering matters (e.g. uSync export only after the site compiles and boots). Useful for estimation.",
       "files": [],
       "expectations": [
-        "Describes three distinct tracks: backend, backoffice/frontend, and DB/content",
+        "Describes four distinct tracks: backend, DB/content, backoffice, and frontend",
         "Backend track includes: .csproj retarget to net10.0, package updates, Program.cs changes, ModelsBuilder fix, and RazorSourceGenerator fix",
-        "Backoffice/frontend track includes: tag helper rename (our-X to etch-cms-X), SCSS changes, RTE/TipTap config, BlockPreview, and CSP",
+        "Backoffice track includes: RTE/TipTap config, BlockPreview, and backoffice SCSS or backoffice info partials",
+        "Frontend track includes: tag helper rename (our-X to etch-cms-X), the GetDictionaryValueOrDefault change, and Umbraco Forms template merge",
         "DB/content track includes: uSync export-fix-import dance with PowerShell scripts and the force-republish workaround",
         "States that step ordering matters — specifically that uSync export only happens after site compiles and boots"
       ]

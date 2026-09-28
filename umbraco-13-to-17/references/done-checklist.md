@@ -22,16 +22,21 @@ into `main`.
 - [ ] 3rd-party data type linkages (HubSpot Form Picker, etc.) all resolved
 - [ ] Templates show up in the backoffice (no fall-through to `/404`)
 - [ ] MNTP filter properties resolve correctly (the UDI → GUID transform worked)
+- [ ] Media library and other List View nodes open without an `orderBy` toast error
 
-## Backoffice / frontend
+## Backoffice
 
 - [ ] Backoffice info partials render across all block types
 - [ ] RTE shows Word Count, new toolbar layout, correct max image size, Uploads folder
 - [ ] Link Picker is available in TipTap
 - [ ] BlockPreview is **disabled** for BlockList (check `appsettings.json`)
+
+## Frontend
+
 - [ ] No `<our-X>` tags remain — all migrated to `<etch-cms-X>` (or knowingly left)
 - [ ] `@Umbraco.GetDictionaryValue` calls all migrated to `GetDictionaryValueOrDefault`
 - [ ] `<etch-cms-img>` sizing parameters match current Etch.Cms.TagHelpers docs
+- [ ] Nested sections render without extra wrapper divs
 
 ## CSP / security
 

@@ -15,8 +15,8 @@ description: |
 # Umbraco 13 → 17 Backend Migration
 
 The goal of this skill is to get a v13 codebase compiling and booting on v17 (`net10.0`). That's it.
-Frontend/backoffice details belong in `umbraco-13-to-17-backoffice-frontend`; content/DB belongs in
-`umbraco-13-to-17-db-content`.
+Backoffice details belong in `umbraco-13-to-17-backoffice`, frontend views in
+`umbraco-13-to-17-frontend`, and content/DB in `umbraco-13-to-17-database`.
 
 ## Order of operations
 
@@ -110,7 +110,7 @@ inline versions for the upgrade and migrate later.
 - ModelsBuilder rebuilds cleanly (no `IPublishedSnapshotAccessor` errors)
 
 You'll still have content issues, missing tag helpers, broken styles — that's expected. Those are
-handled by the other two sub-skills. Don't try to fix everything in one pass.
+handled by the other three sub-skills. Don't try to fix everything in one pass.
 
 ## Reference files
 

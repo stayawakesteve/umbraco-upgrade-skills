@@ -1,24 +1,27 @@
 ---
-name: umbraco-13-to-17-db-content
+name: umbraco-13-to-17-database
 description: |
   Migrates the database and content side of an Etch CMS site from Umbraco 13 to Umbraco 17. Use this
   skill for any uSync, content migration, content republish, MNTP/data type, or template-import issue
   in a v13→v17 upgrade. Covers the MNTP filter UDI → GUID transformation (with bundled PowerShell
   script), the nameTemplate AngularJS → UFM rewrite, re-linking 3rd-party data types whose property
   editor changed (HubSpot Form Picker etc.), the visible block migration bug (with bundled fix script),
-  the content-rendering bug workaround (delete home → uSync re-import to force republish), and the
-  master template ordering gotcha (_layout.config prefix trick for "template not found" errors).
+  the content-rendering bug workaround (delete home → uSync re-import to force republish), the List View
+  orderBy casing bug (with bundled fix script), and the master template ordering gotcha (_layout.config
+  prefix trick for "template not found" errors).
   Trigger on phrases like "uSync import failing", "templates not found after v17 upgrade", "blocks
   hidden on v17", "content not rendering after Umbraco upgrade", "MNTP filter broken", "HubSpot Form
-  Picker missing", "umbContentName UFM", or whenever a user mentions content/uSync symptoms in a
-  v13→v17 context.
+  Picker missing", "umbContentName UFM", "Order by value is not a property on the configured collection",
+  "orderBy property is not part of the collection configuration", "media library error after v17 upgrade",
+  or whenever a user mentions content/uSync symptoms in a v13→v17 context.
 ---
 
 # Umbraco 13 → 17 Database / Content Migration
 
 This skill covers the uSync export/fix/import workflow and the content-side bugs that the v13→v17
 migration triggers. Backend (.csproj, Program.cs, namespaces) is owned by `umbraco-13-to-17-backend`;
-backoffice/frontend cosmetics are owned by `umbraco-13-to-17-backoffice-frontend`.
+backoffice and frontend changes are owned by `umbraco-13-to-17-backoffice` and
+`umbraco-13-to-17-frontend`.
 
 ## The canonical workflow
 
@@ -30,15 +33,16 @@ Once the site is **compiling and booting** (backend skill is done):
 3. **Full uSync export** from v17 → writes fresh files to `uSync/v17/`
 4. **Run UDI → GUID transform** (`transform-mntp-filter-udis-to-guids.ps1`) against `uSync/v17/Content`
 5. **Fix `nameTemplate` syntax** — `{{ value | ncNodeName }}` → `{umbContentName: value}`
-6. **Re-link 3rd-party data types** (HubSpot Form Picker etc.) whose property editor changed
-7. **Re-import uSync** with the fixes applied
-8. **Force-republish workaround** — delete the home node, run uSync import to recreate, which forces
+6. **Fix List View `orderBy` casing** — run `fix-listview-orderby-casing.ps1` against `uSync/v17/DataTypes`
+7. **Re-link 3rd-party data types** (HubSpot Form Picker etc.) whose property editor changed
+8. **Re-import uSync** with the fixes applied
+9. **Force-republish workaround** — delete the home node, run uSync import to recreate, which forces
    a republish of every node and resolves the content-rendering bug
-9. **Fix master template ordering** if templates fail to import on a fresh DB (`_layout.config` trick)
+10. **Fix master template ordering** if templates fail to import on a fresh DB (`_layout.config` trick)
 
 ## Bundled scripts
 
-This skill ships two PowerShell scripts in `scripts/`:
+This skill ships three PowerShell scripts in `scripts/`:
 
 ### `scripts/fix-visible-property.ps1` (v13-side, pre-flight)
 
@@ -75,6 +79,30 @@ The script:
 
 The "only within `<filters>`" scoping is important — other UDI references in the file (e.g. for
 content pickers using the standard editor) shouldn't be touched.
+
+### `scripts/fix-listview-orderby-casing.ps1` (v17-side, post-export)
+
+**Run this after exporting uSync from v17 but before re-importing.**
+
+The v14 List View migration lower-cases the config keys and property aliases to camelCase
+(`sortOrder`, `updateDate`, `creator`, …) but leaves the **`orderBy` value** in its old v13
+PascalCase form (`SortOrder`, `Name`, `VersionDate`). v17's collection view validates `orderBy`
+against the configured aliases **case-sensitively**, so `SortOrder` ≠ `sortOrder` and the backoffice
+throws when you open the affected node list (e.g. the Media library):
+
+> Order by value is not a property on the configured collection
+
+This is a **client-side** validation error — nothing appears in the Umbraco logs, which makes it
+easy to misdiagnose. It affects *every* migrated List View data type, not just Media.
+
+The script:
+- Walks `uSync\v17\DataTypes` recursively
+- For each `.config` with an `"orderBy"` value, re-cases it to match a configured alias
+  (the data type's own `includeProperties` aliases + the system aliases like `name`, `sortOrder`,
+  `updateDate`, `creator`)
+- Applies the one legacy rename (`VersionDate` → `updateDate`) that isn't just a casing change
+- Warns (and leaves untouched) any `orderBy` it can't match, so you can inspect it manually
+- Reports each `old → new` change
 
 ## The content rendering bug (and its workaround)
 

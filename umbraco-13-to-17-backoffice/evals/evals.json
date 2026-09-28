@@ -1,22 +1,8 @@
 {
-  "skill_name": "umbraco-13-to-17-backoffice-frontend",
+  "skill_name": "umbraco-13-to-17-backoffice",
   "evals": [
     {
       "id": 1,
-      "prompt": "Site's been upgraded to v17 and I'm working through the tag helper updates. Need to migrate all our `<our-img>`, `<our-link>`, and `<our-rich-text>` tags. Is it just a find/replace or is there more to it? Also noticed `@Umbraco.GetDictionaryValue` is everywhere in our views — does that need updating too?",
-      "expected_output": "Confirms tag helper renames are a regex find/replace (provides one), but flags two extra considerations: `<etch-cms-img>` sizing parameters changed in v17 so don't migrate from memory, and the `OurIMG` config key in appsettings.json must NOT be renamed despite the tag rename. Confirms `GetDictionaryValue` should become `GetDictionaryValueOrDefault` — explains the behaviour change (v17 returns the literal key instead of empty when missing, which renders verbatim on the page). Recommends doing this before any QA pass. Points to taghelpers-migration.md.",
-      "files": [],
-      "expectations": [
-        "Confirms the <our-X> to <etch-cms-X> rename can be done via find/replace and provides a regex or command to do it",
-        "Flags that <etch-cms-img> sizing parameters changed in v17 — check the docs, don't migrate from memory",
-        "States that the OurIMG config key in appsettings.json must NOT be renamed despite the tag rename",
-        "States that @Umbraco.GetDictionaryValue should be replaced with @Umbraco.GetDictionaryValueOrDefault",
-        "Explains the behaviour change: v17 returns the literal key (not empty string) when the key is missing, causing it to render verbatim on the page",
-        "References taghelpers-migration.md"
-      ]
-    },
-    {
-      "id": 2,
       "prompt": "After our v17 upgrade, editors are complaining that the BlockList editor is doing weird double-render things — like the preview keeps flashing or sometimes the block content shows twice. BlockGrid editor is fine, only BlockList. Any idea what's up?",
       "expected_output": "Identifies this as BlockPreview being enabled for BlockList — should be disabled in v17 because the v17 backoffice BlockList editor has its own preview behaviour that conflicts. Provides the appsettings.json fix (BlockPreview.BlockList.Enabled = false, while BlockPreview.BlockGrid stays enabled). Points to blocks-and-pickers.md.",
       "files": [],
@@ -28,7 +14,7 @@
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "prompt": "Editors are reporting that the YouTube embed feature in the rich text editor doesn't work since we upgraded to v17. They click the YouTube button, paste a URL, and nothing happens — browser console shows some kind of CSP / referrer error. RTE works fine for everything else.",
       "expected_output": "Identifies this as the YouTube backoffice CSP/Referrer-Policy issue. The fix is in Program.cs — middleware that overrides Referrer-Policy to 'strict-origin-when-cross-origin' for any request path starting with /umbraco. Notes this is technically a backend fix (cross-references umbraco-13-to-17-backend's program-cs-v17.md) but acknowledges the editor-facing symptom belongs to this skill. Provides the middleware code snippet.",
       "files": [],
@@ -40,9 +26,9 @@
       ]
     },
     {
-      "id": 4,
+      "id": 3,
       "prompt": "We have a Block Grid data type on the site with about 20 block configurations. Each one has a label like `{{ heading }}` or `{{ value | ncNodeName }}`. After the v17 upgrade those labels are showing the raw template syntax instead of values in the backoffice. What's the new format?",
-      "expected_output": "Identifies this as the AngularJS → UFM (Umbraco Flavored Markdown) template syntax change. Provides the mapping: `{{ heading }}` → `{$heading}` or `{heading}`, `{{ value | ncNodeName }}` → `{umbContentName: value}`. Mentions this can be done either in the backoffice UI per data type OR by mass-editing the uSync data type config files (recommends the latter for 20 blocks). Notes the equivalent rewrite is needed in uSync nameTemplate fields, cross-references the db-content skill. Points to blocks-and-pickers.md and the nametemplate-rewrite.md in the db-content skill.",
+      "expected_output": "Identifies this as the AngularJS → UFM (Umbraco Flavored Markdown) template syntax change. Provides the mapping: `{{ heading }}` → `{$heading}` or `{heading}`, `{{ value | ncNodeName }}` → `{umbContentName: value}`. Mentions this can be done either in the backoffice UI per data type OR by mass-editing the uSync data type config files (recommends the latter for 20 blocks). Notes the equivalent rewrite is needed in uSync nameTemplate fields, cross-references the database skill. Points to blocks-and-pickers.md and the nametemplate-rewrite.md in the database skill.",
       "files": [],
       "expectations": [
         "Identifies this as the AngularJS to UFM (Umbraco Flavored Markdown) label template syntax change",
@@ -53,7 +39,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 4,
       "prompt": "Working through the v17 SCSS migration. I've imported blockpreview.scss from the v17 template. What else am I missing? The backoffice info partials look unstyled — they're showing in grey instead of our brand colour, and our block grid in the editor looks weird too.",
       "expected_output": "Identifies multiple issues to address: (1) backoffice info SCSS needs the colour values migrated from the v13 variables/_color.scss into the v17 backoffice info styles — that's why they're grey; (2) `.umb-block-grid` rules should be REMOVED from editor.scss because they now ship in the package at App_Plugins/Etch.Cms.Umbraco/src/block-grid-shadow.css — local rules conflict; (3) picker styles should move from editor.scss to the App_Plugins/Etch.Cms.Umbraco/umbraco-package.json setup; (4) add .stylelintcache to .gitignore. Points to scss-and-partials.md.",
       "files": [],
@@ -63,6 +49,19 @@
         "Mentions that picker styles should move from editor.scss to the App_Plugins setup",
         "Mentions adding .stylelintcache to .gitignore",
         "References scss-and-partials.md"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Content editors on our freshly-upgraded v17 site say the rich text editor feels 'wrong' compared to v13 — no word count, images they upload end up dumped in the root of the Media section, and they can't add buttons in body copy any more, only plain links. What do I need to change?",
+      "expected_output": "Identifies these as RTE/TipTap data type config gaps after the move from TinyMCE to TipTap. For every Rich Text data type: enable Word Count (off by default in v17), set the Image Upload Folder to a top-level 'Uploads' media folder (create it if missing), and apply the standard Etch toolbar layout rather than recreating the v13 TinyMCE toolbar. For buttons: register the Link Picker prop for TipTap from the v17 Etch.Cms template. Also mentions setting the max inserted image size to 1280. Points to rte-config.md.",
+      "files": [],
+      "expectations": [
+        "States Word Count must be enabled per Rich Text data type because it is off by default in v17",
+        "States the Image Upload Folder should be set to a top-level 'Uploads' media folder (creating it if needed)",
+        "Identifies the missing buttons as needing the Link Picker prop for TipTap, taken from the v17 Etch.Cms template",
+        "Recommends applying the standard Etch toolbar layout rather than recreating the v13 TinyMCE toolbar one-for-one",
+        "References rte-config.md"
       ]
     }
   ]

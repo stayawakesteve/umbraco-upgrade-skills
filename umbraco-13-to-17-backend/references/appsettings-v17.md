@@ -26,7 +26,7 @@ In v13, BlockPreview was often enabled for BlockList. In v17, it should be **off
 the v17 backoffice has its own preview behaviour that fights with BlockPreview. Leaving it on
 causes weird double-render artifacts in the BlockList editor.
 
-The frontend skill (`umbraco-13-to-17-backoffice-frontend`) covers this in more detail; this is
+The backoffice skill (`umbraco-13-to-17-backoffice`) covers this in more detail; this is
 just the config side.
 
 ### `Etch.Cms.Umbraco.TagHelpers.OurIMG`

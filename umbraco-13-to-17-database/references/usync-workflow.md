@@ -57,6 +57,21 @@ Replace: "nameTemplate": "{umbContentName: value}"
 than in the backoffice after import) is faster because you can mass-replace across all data types
 at once.
 
+### List View `orderBy` casing
+
+```powershell
+.\scripts\fix-listview-orderby-casing.ps1
+```
+
+The script targets `uSync\v17\DataTypes` (hardcoded path — confirm yours matches before running).
+It re-cases each List View `orderBy` value to match a configured alias (`SortOrder` → `sortOrder`)
+and renames the legacy `VersionDate` to `updateDate`. Without it, opening the Media library (and
+every other migrated List View) throws "Order by value is not a property on the configured
+collection".
+
+Any line reported as `Skipped` is an `orderBy` the script couldn't match to a known alias — check
+those data types by hand. See `references/content-migration-gotchas.md` §4 for the full background.
+
 ## Step 3: 3rd-party data type re-linkage
 
 For each data type whose property editor alias changed in v17 (HubSpot Form Picker is the canonical

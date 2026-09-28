@@ -160,7 +160,7 @@ Plus the nginx config files:
 ## Step 4: Etch.Cms.PropertyEditors
 
 If the v13 site used the custom repository-based MNTP property editor, keep these (and remember
-the UDI → GUID transform in `umbraco-13-to-17-db-content`):
+the UDI → GUID transform in `umbraco-13-to-17-database`):
 
 ```xml
 <PackageReference Include="Etch.Cms.Umbraco.PropertyEditors.RepositoryBasedMntp" />

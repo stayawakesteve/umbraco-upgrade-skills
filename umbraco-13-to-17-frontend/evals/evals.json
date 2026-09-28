@@ -1,0 +1,68 @@
+{
+  "skill_name": "umbraco-13-to-17-frontend",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Site's been upgraded to v17 and I'm working through the tag helper updates. Need to migrate all our `<our-img>`, `<our-link>`, and `<our-rich-text>` tags. Is it just a find/replace or is there more to it? Also noticed `@Umbraco.GetDictionaryValue` is everywhere in our views — does that need updating too?",
+      "expected_output": "Confirms tag helper renames are a regex find/replace (provides one), but flags two extra considerations: `<etch-cms-img>` sizing parameters changed in v17 so don't migrate from memory, and the `OurIMG` config key in appsettings.json must NOT be renamed despite the tag rename. Confirms `GetDictionaryValue` should become `GetDictionaryValueOrDefault` — explains the behaviour change (v17 returns the literal key instead of empty when missing, which renders verbatim on the page). Recommends doing this before any QA pass. Points to taghelpers-migration.md.",
+      "files": [],
+      "expectations": [
+        "Confirms the <our-X> to <etch-cms-X> rename can be done via find/replace and provides a regex or command to do it",
+        "Flags that <etch-cms-img> sizing parameters changed in v17 — check the docs, don't migrate from memory",
+        "States that the OurIMG config key in appsettings.json must NOT be renamed despite the tag rename",
+        "States that @Umbraco.GetDictionaryValue should be replaced with @Umbraco.GetDictionaryValueOrDefault",
+        "Explains the behaviour change: v17 returns the literal key (not empty string) when the key is missing, causing it to render verbatim on the page",
+        "References taghelpers-migration.md"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "QA on our v17 upgrade has raised about 40 'missing content' bugs. Looking at them, loads of pages are showing strings like `footer.copyright` and `nav.skipToContent` where the text should be. The dictionary items exist in the backoffice for most of them. Nothing was changed in the views. What's going on?",
+      "expected_output": "Identifies this as the GetDictionaryValue behaviour change in v17: when a key is missing or its value is empty, it now returns the literal key instead of an empty string, so keys render verbatim on the page. Fix is a project-wide replace of @Umbraco.GetDictionaryValue(\"key\") with @Umbraco.GetDictionaryValueOrDefault(\"key\", fallback). Notes that many of the QA bugs are likely false positives caused by this and recommends doing the replace before re-running QA. Points to taghelpers-migration.md.",
+      "files": [],
+      "expectations": [
+        "Identifies the cause as v17 GetDictionaryValue returning the literal key (not an empty string) when the value is missing or empty",
+        "Provides the fix: replace @Umbraco.GetDictionaryValue with @Umbraco.GetDictionaryValueOrDefault project-wide, with a fallback value",
+        "Notes many of the QA 'missing content' reports are likely false positives from this change and recommends fixing it before re-running QA",
+        "References taghelpers-migration.md"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Since upgrading to v17, any page where we've put a Section block inside another Section block has a broken layout on the live site — there seem to be extra wrapper divs and the inner section's content is squashed. Top-level sections look fine. It's only on the frontend, the backoffice preview is OK.",
+      "expected_output": "Identifies this as the known v17 nested-section BlockGrid frontend bug. The fix is in Views/Partials/blockgrid/Components/SectionContent.cshtml — bring across the delta from the v17 Etch.Cms template's version of the file (typically a conditional that skips outer-wrapper rendering when already inside a section). Advises copying from the template rather than recreating the fix from memory. Points to views-and-csp.md.",
+      "files": [],
+      "expectations": [
+        "Identifies this as the v17 nested-section BlockGrid frontend rendering bug",
+        "States the fix is in Views/Partials/blockgrid/Components/SectionContent.cshtml",
+        "Advises copying the change from the v17 Etch.Cms template's SectionContent.cshtml rather than recreating it from memory",
+        "References views-and-csp.md"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "We customised a few of the Umbraco Forms templates on the v13 site (extra wrapper classes, a custom date field partial, and some JS that hooks onto field class names). Now we're on v17 — can I just copy our v13 Forms views across?",
+      "expected_output": "No — the v13 templates will break against v17 Forms, and overwriting the v17 templates loses customisations. The correct direction is to take the v17 stock templates and re-apply each v13 customisation to them, not the other way round. Specific watch points: wrapper classes are easy to re-add; the custom date field partial may need rewriting if the v17 field type interface or @model changed; JS hooks need the class names verifying since some changed in v17. Recommends end-to-end verification including validation, submission, reCAPTCHA and the Entries view. Points to umbraco-forms.md.",
+      "files": [],
+      "expectations": [
+        "Says not to copy the v13 templates across as-is because they break against v17 Forms",
+        "Recommends starting from the v17 stock templates and re-applying each customisation to them (not applying v17 changes to the v13 versions)",
+        "Flags that the custom field type partial may need rewriting if the v17 field type interface or @model changed",
+        "Flags that JavaScript hooks tied to class names need checking because some class names changed in v17",
+        "References umbraco-forms.md"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I'm tidying up the CSP in Program.cs on our v17 site and want to drop 'unsafe-inline' from style-src — it looks like a leftover. Anything I should know before I remove it?",
+      "expected_output": "Warns that 'unsafe-inline' in style-src is required for the CIVIC Cookie Control widget; removing it breaks the cookie banner. Recommends keeping it and keeping (or adding) the inline comment explaining why. Tightening further would require moving CIVIC styles into a CSP-friendly configuration, which is a separate piece of work. Points to views-and-csp.md and/or the backend skill's program-cs-v17.md.",
+      "files": [],
+      "expectations": [
+        "Warns that style-src 'unsafe-inline' is required for the CIVIC cookie banner and removing it will break it",
+        "Recommends keeping the inline comment that explains why UnsafeInline is there",
+        "Notes that removing it safely would need CIVIC styles moved to a CSP-friendly configuration, as separate work",
+        "References views-and-csp.md or program-cs-v17.md"
+      ]
+    }
+  ]
+}

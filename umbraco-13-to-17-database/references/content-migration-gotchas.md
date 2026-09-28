@@ -1,6 +1,6 @@
 # Content migration gotchas
 
-The three weird content-side bugs that catch every v13 → v17 upgrade. Each has a known workaround.
+The weird content-side bugs that catch every v13 → v17 upgrade. Each has a known workaround.
 
 ## 1. The "visible state" bug
 
@@ -78,11 +78,35 @@ After re-import, the data type resolves correctly and properties using it render
 usually call out alias renames. If not documented, install the package on a fresh v17 site and
 inspect the data type it creates.
 
+## 4. The List View `orderBy` casing bug
+
+**Symptom:** Opening a node list in the backoffice — most visibly the **Media library** — throws a
+toast error:
+
+> An error occurred
+> Order by value is not a property on the configured collection
+> The specified orderBy property is not part of the collection configuration
+
+Nothing appears in the Umbraco logs, because it's a **client-side** validation error thrown by the
+collection view UI, not a server exception. That makes it easy to misdiagnose.
+
+**Root cause:** The v14 List View migration lower-cases the config keys and property aliases to
+camelCase (`sortOrder`, `updateDate`, `creator`, …) but leaves the `orderBy` **value** in its old
+v13 PascalCase form (`SortOrder`, `Name`, `VersionDate`). v17's collection view validates `orderBy`
+against the configured aliases **case-sensitively**, so `SortOrder` no longer matches `sortOrder`.
+It affects *every* migrated List View data type, not just Media — you'd hit it on Content, Members,
+News Index, etc. as soon as you open each list.
+
+**Fix:** Run the v17-side `fix-listview-orderby-casing.ps1` script after export, before re-import.
+It walks `uSync\v17\DataTypes`, re-cases each `orderBy` value to match a configured or system alias,
+applies the one legacy rename (`VersionDate` → `updateDate`), and reports each change. Then re-import
+the data types (or restart the site if you have a startup import).
+
 ## Cross-cutting principle
 
-These three bugs share a pattern: **what worked silently in v13 becomes a no-op in v17 because of
-stricter handling**. Empty strings become hidden. Stale published states become missing content.
-Misaligned property aliases become missing data types.
+These bugs share a pattern: **what worked silently in v13 becomes a no-op in v17 because of stricter
+handling**. Empty strings become hidden. Stale published states become missing content. Misaligned
+property aliases become missing data types. Case-insensitive orderBy matching becomes case-sensitive.
 
-When troubleshooting other "looks fine on v13, missing on v17" symptoms, look for the same shape:
+When troubleshooting other "looks fine on v13, breaks on v17" symptoms, look for the same shape:
 some convention in v13 that depended on lenient interpretation now needs to be made explicit.

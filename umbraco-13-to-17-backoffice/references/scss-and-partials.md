@@ -1,6 +1,6 @@
 # SCSS and partials migration
 
-The v17 backoffice/frontend SCSS changes are the cosmetic side of the upgrade. Most are mechanical
+The v17 backoffice SCSS changes are the cosmetic side of the upgrade. Most are mechanical
 — bring across a file, update imports, move some styles to a different location. None are hard
 individually; the gotcha is forgetting one and shipping a half-styled site.
 
@@ -27,10 +27,9 @@ in fresh from the v17 template.
 ## 2. Section partials
 
 Section partials live at `Views/Partials/blockgrid/Components/Section.cshtml` (and related). Bring
-them up to v17 standards by:
-
-1. Including the **backoffice info partial** if it's missing — v17 backoffice expects it
-2. Fixing the **nested section issue** — see below
+them up to v17 standards by including the **backoffice info partial** if it's missing — v17
+backoffice expects it. (The nested-section rendering fix in `SectionContent.cshtml` is a frontend
+change — see `umbraco-13-to-17-frontend` → `references/views-and-csp.md`.)
 
 ### Including backoffice info partial
 
@@ -45,15 +44,6 @@ Each section partial should include something like:
 
 Older Etch.Cms sites may not have this — without it, editors see less context about the section in
 the backoffice. Apply to all block partials, not just sections.
-
-### Nested section frontend bug
-
-In v17, sections nested inside other sections render with extra wrapper markup that breaks the
-intended layout. The fix is in `Views/Partials/blockgrid/Components/SectionContent.cshtml` — check
-the v17 Etch.Cms template's version of this file and bring across whatever delta exists.
-
-The fix is typically a conditional that skips outer-wrapper rendering when the current section is
-already inside another section. Don't try to recreate from memory — copy from the template.
 
 ## 3. Backoffice info SCSS
 
@@ -118,6 +108,3 @@ After all SCSS / partial work:
    - Block grid editor renders correctly
    - Backoffice info partials show with correct colours
    - Pickers render with correct styling
-3. Load the frontend and check:
-   - Sections render without extra wrapper divs (no nested-section bug)
-   - Block grid frontend rendering is intact

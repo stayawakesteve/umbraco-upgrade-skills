@@ -1,13 +1,14 @@
 # Umbraco 13 → 17 Skills Bundle
 
-Four skills for upgrading Etch CMS sites from Umbraco 13 to v17:
+Five skills for upgrading Etch CMS sites from Umbraco 13 to v17:
 
 - **`umbraco-13-to-17/`** — router / orchestrator
 - **`umbraco-13-to-17-backend/`** — .csproj, Program.cs, namespaces, build errors
-- **`umbraco-13-to-17-backoffice-frontend/`** — tag helpers, SCSS, RTE, CSP
-- **`umbraco-13-to-17-db-content/`** — uSync, content migration, includes 2 PowerShell scripts
+- **`umbraco-13-to-17-database/`** — uSync, content migration, includes 3 PowerShell scripts
+- **`umbraco-13-to-17-backoffice/`** — editor-facing: RTE, block previews and labels, backoffice SCSS, backoffice CSP
+- **`umbraco-13-to-17-frontend/`** — visitor-facing: tag helpers, dictionary values, views, Umbraco Forms, frontend CSP
 
-Each skill includes its own `evals/evals.json` with 5 test prompts.
+Each skill includes its own `evals/evals.json` with 5–6 test prompts.
 
 ## To evaluate the skills (one-shot setup)
 
@@ -20,8 +21,9 @@ this-folder/
 ├── skill-evals/                              ← your existing skill-evals folder
 ├── umbraco-13-to-17/
 ├── umbraco-13-to-17-backend/
-├── umbraco-13-to-17-backoffice-frontend/
-└── umbraco-13-to-17-db-content/
+├── umbraco-13-to-17-backoffice/
+├── umbraco-13-to-17-database/
+└── umbraco-13-to-17-frontend/
 ```
 
 ### 2. Sanity check
@@ -56,7 +58,7 @@ when done.
 Claude reads skill-evals, spawns subagents per eval prompt with the umbraco skill loaded,
 grades, and opens the viewer. Review, give feedback, close.
 
-### 5. Repeat for the other three skills
+### 5. Repeat for the other four skills
 
 Same prompt with different paths:
 
@@ -65,11 +67,15 @@ Now do the same for ./umbraco-13-to-17
 ```
 
 ```
-Now do the same for ./umbraco-13-to-17-backoffice-frontend
+Now do the same for ./umbraco-13-to-17-backoffice
 ```
 
 ```
-Now do the same for ./umbraco-13-to-17-db-content
+Now do the same for ./umbraco-13-to-17-database
+```
+
+```
+Now do the same for ./umbraco-13-to-17-frontend
 ```
 
 ## Troubleshooting
@@ -110,20 +116,26 @@ SKILL.md and are only read by skill-evals.
   - `appsettings-v17.md` — appsettings.json deltas vs v13
   - `razor-source-generator-fix.md` — CS8785 duplicate hintName error
 
-### `umbraco-13-to-17-backoffice-frontend/`
-- SKILL.md, 5 reference files:
-  - `taghelpers-migration.md` — `<our-X>` → `<etch-cms-X>` and GetDictionaryValueOrDefault
-  - `scss-and-partials.md` — blockpreview.scss, section partials, backoffice info colours
+### `umbraco-13-to-17-backoffice/`
+- SKILL.md, 3 reference files:
+  - `scss-and-partials.md` — blockpreview.scss, section partials, backoffice info colours, picker styles
   - `rte-config.md` — TipTap Word Count, toolbar, image sizing, Uploads folder
-  - `blocks-and-pickers.md` — BlockPreview, UFM labels, CSP, CIVIC
+  - `blocks-and-pickers.md` — BlockPreview, UFM labels, backoffice info partials, YouTube CSP
+
+### `umbraco-13-to-17-frontend/`
+- SKILL.md, 3 reference files:
+  - `taghelpers-migration.md` — `<our-X>` → `<etch-cms-X>` and GetDictionaryValueOrDefault
+  - `views-and-csp.md` — nested-section BlockGrid fix, CIVIC cookie banner CSP
   - `umbraco-forms.md` — Forms template merge
 
-### `umbraco-13-to-17-db-content/`
+### `umbraco-13-to-17-database/`
 - SKILL.md, 4 reference files:
   - `usync-workflow.md` — full export-fix-import sequence
-  - `content-migration-gotchas.md` — visible-state bug, republish workaround, 3rd-party data types
+  - `content-migration-gotchas.md` — visible-state bug, republish workaround, 3rd-party data types,
+    List View `orderBy` casing
   - `template-import-order.md` — `_layout.config` prefix trick
   - `nametemplate-rewrite.md` — AngularJS → UFM template syntax
-- `scripts/` — two ready-to-run PowerShell scripts:
+- `scripts/` — three ready-to-run PowerShell scripts:
   - `fix-visible-property.ps1` (run on v13 side, pre-upgrade)
   - `transform-mntp-filter-udis-to-guids.ps1` (run on v17 side, post-export)
+  - `fix-listview-orderby-casing.ps1` (run on v17 side, post-export)

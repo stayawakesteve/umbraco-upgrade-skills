@@ -1,7 +1,7 @@
-# Blocks, pickers, labels, CSP
+# Blocks, labels, CSP
 
-The miscellaneous backoffice/frontend fixes that don't fit cleanly into "tag helpers", "SCSS",
-or "RTE config". Mostly small, all easy to miss.
+The miscellaneous backoffice fixes that don't fit cleanly into "SCSS" or "RTE config". Mostly
+small, all easy to miss.
 
 ## 1. BlockPreview off on BlockList
 
@@ -63,7 +63,7 @@ Property paths use UFM dot notation, and you can call helper functions like `umb
 ```
 
 This is the same template transformation that needs doing in uSync content files (see
-`umbraco-13-to-17-db-content` → `references/usync-workflow.md`). Doing the labels in the backoffice
+`umbraco-13-to-17-database` → `references/usync-workflow.md`). Doing the labels in the backoffice
 UI is one way; mass-editing the uSync files is another. Both routes converge.
 
 ## 3. Backoffice info partials on all blocks
@@ -95,21 +95,3 @@ middleware".
 Short version: add middleware that sets `Referrer-Policy: strict-origin-when-cross-origin` for any
 request path starting with `/umbraco`. Without this override, the default tighter policy blocks the
 YouTube embed's referrer-based auth.
-
-## 5. CIVIC cookie banner still needs `unsafe-inline` style-src
-
-The site's CSP needs to keep `style-src 'unsafe-inline'` for the CIVIC Cookie Control widget to
-render. In `Program.cs`:
-
-```csharp
-app.UseFrontEndSecurityHeaders(configureCsp: builder =>
-    // UnsafeInline required for CIVIC
-    builder.AddStyleSrc()
-        .UnsafeInline()
-        .OverHttps()
-        .Self());
-```
-
-Keep the inline comment — without it, the next person tightening CSP will remove `UnsafeInline`
-and break the cookie banner. Tightening CSP further requires moving CIVIC styles into a CSP-friendly
-configuration, which is a separate piece of work.
