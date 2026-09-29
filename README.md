@@ -1,142 +1,154 @@
-# Umbraco 13 → 17 Skills Bundle
+# Umbraco 13 → 17 upgrade skills
 
-Five skills for upgrading Etch CMS sites from Umbraco 13 to v17:
+Five agent skills that guide an AI coding assistant through upgrading an Etch CMS site from
+Umbraco 13 (.NET 8) to Umbraco 17 (.NET 10). They cover the build, the database and uSync
+content, the backoffice, and the frontend views, including the known v17 migration bugs and
+their fixes.
 
-- **`umbraco-13-to-17/`** — router / orchestrator
-- **`umbraco-13-to-17-backend/`** — .csproj, Program.cs, namespaces, build errors
-- **`umbraco-13-to-17-database/`** — uSync, content migration, includes 3 PowerShell scripts
-- **`umbraco-13-to-17-backoffice/`** — editor-facing: RTE, block previews and labels, backoffice SCSS, backoffice CSP
-- **`umbraco-13-to-17-frontend/`** — visitor-facing: tag helpers, dictionary values, views, Umbraco Forms, frontend CSP
+The skills use the open [Agent Skills](https://agentskills.io) format (a folder with a
+`SKILL.md` file), so they work in any assistant that supports it: Claude Code, OpenAI Codex,
+GitHub Copilot in VS Code, Cursor, Gemini CLI and others. Nothing in them is tied to one tool.
 
-Each skill includes its own `evals/evals.json` with 5–6 test prompts.
+## The skills
 
-## To evaluate the skills (one-shot setup)
+| Skill | Use it for |
+|---|---|
+| `umbraco-13-to-17` | **Start here.** The overall upgrade order, and routing to the right sub-skill. |
+| `umbraco-13-to-17-backend` | Getting the site to build and boot: `.csproj` → `net10.0`, NuGet packages, `Program.cs`, ModelsBuilder errors, `appsettings.json`. |
+| `umbraco-13-to-17-database` | uSync export/fix/import, missing or hidden content, template import failures, data types. Includes three PowerShell fix scripts. |
+| `umbraco-13-to-17-backoffice` | What editors see: RTE/TipTap config, BlockPreview, block labels, backoffice styles, YouTube embeds in the RTE. |
+| `umbraco-13-to-17-frontend` | What visitors see: `<our-X>` → `<etch-cms-X>` tag helpers, dictionary values, nested sections, Umbraco Forms templates, cookie banner CSP. |
 
-### 1. Drop your `skill-evals` skill folder in alongside these
+The skills point to each other by name, so **install all five together**.
 
-Final directory layout:
+## Install
 
-```
-this-folder/
-├── skill-evals/                              ← your existing skill-evals folder
-├── umbraco-13-to-17/
-├── umbraco-13-to-17-backend/
-├── umbraco-13-to-17-backoffice/
-├── umbraco-13-to-17-database/
-└── umbraco-13-to-17-frontend/
-```
+Put the five `umbraco-13-to-17*` folders into your assistant's skills folder, either inside the
+Umbraco project you're upgrading (only that project sees them) or in your home folder (every
+project sees them).
 
-### 2. Sanity check
+| Assistant | Project folder | Personal folder |
+|---|---|---|
+| OpenAI Codex (CLI and IDE extension) | `.agents/skills/` | `~/.agents/skills/` |
+| GitHub Copilot in VS Code | `.agents/skills/` or `.github/skills/` | `~/.agents/skills/` or `~/.copilot/skills/` |
+| Cursor | `.agents/skills/` or `.cursor/skills/` | `~/.agents/skills/` or `~/.cursor/skills/` |
+| Gemini CLI | `.agents/skills/` or `.gemini/skills/` | `~/.agents/skills/` or `~/.gemini/skills/` |
+| Claude Code | `.claude/skills/` | `~/.claude/skills/` |
 
-From this folder, run:
+`.agents/skills/` works for every tool above except Claude Code, so it's the best choice if your
+team uses a mix. Check your tool's own docs if it isn't listed; most use one of these paths.
+
+**macOS / Linux**, from the root of the Umbraco project:
 
 ```bash
-ls skill-evals/SKILL.md \
-   skill-evals/eval-viewer/generate_review.py \
-   umbraco-13-to-17-backend/SKILL.md \
-   umbraco-13-to-17-backend/evals/evals.json
+git clone https://github.com/stayawakesteve/umbraco-upgrade-skills.git /tmp/umbraco-upgrade-skills
 ```
-
-All four paths should resolve. If any error, fix that before continuing.
-
-### 3. Start Claude Code in this folder
 
 ```bash
-cd /path/to/this-folder
-claude
+mkdir -p .agents/skills && cp -R /tmp/umbraco-upgrade-skills/umbraco-13-to-17* .agents/skills/
 ```
 
-### 4. Paste this prompt
+**Windows (PowerShell)**, from the root of the Umbraco project:
 
-```
-Read ./skill-evals/SKILL.md and follow it to evaluate the skill at ./umbraco-13-to-17-backend
-using the evals in ./umbraco-13-to-17-backend/evals/evals.json. Apply skill-evals' lean
-defaults: no baseline runs this iteration, Haiku for grading, surface the eval viewer
-when done.
-```
-
-Claude reads skill-evals, spawns subagents per eval prompt with the umbraco skill loaded,
-grades, and opens the viewer. Review, give feedback, close.
-
-### 5. Repeat for the other four skills
-
-Same prompt with different paths:
-
-```
-Now do the same for ./umbraco-13-to-17
+```powershell
+git clone https://github.com/stayawakesteve/umbraco-upgrade-skills.git $env:TEMP\umbraco-upgrade-skills
+New-Item -ItemType Directory -Force .agents\skills | Out-Null
+Copy-Item -Recurse $env:TEMP\umbraco-upgrade-skills\umbraco-13-to-17* .agents\skills\
 ```
 
-```
-Now do the same for ./umbraco-13-to-17-backoffice
-```
+Swap `.agents/skills` for your tool's folder from the table if you need to. Restart the
+assistant, or start a new chat, so it picks the skills up. In Gemini CLI, run `/skills reload`
+and check they're enabled with `/skills list`.
 
-```
-Now do the same for ./umbraco-13-to-17-database
-```
+To keep them up to date, clone the repo somewhere permanent and symlink the folders in instead
+of copying.
 
-```
-Now do the same for ./umbraco-13-to-17-frontend
-```
+## Using the skills
 
-## Troubleshooting
+### Just describe what you're doing
 
-**"No evals.json found"** → check `<skill>/evals/evals.json` exists. They're already in place
-in this bundle but worth confirming if you've moved things.
+You don't need to name a skill. Each one has a description of the situations it handles, and the
+assistant loads the right one when your request matches. Mention **v13 and v17** (or "Umbraco
+17") so it knows you're mid-upgrade:
 
-**"Cannot find skill at path"** → the path is relative to where `claude` was started. Run
-`pwd` to confirm you're in the parent folder.
+> We're upgrading this site from Umbraco 13 to 17. Where do I start?
 
-**Viewer doesn't open** → check `skill-evals/eval-viewer/generate_review.py` exists. If your
-`skill-evals` folder is missing the viewer, the skill can't surface results — re-unpack
-the original `skill-evals.zip`.
+> After the v17 upgrade, the Media library throws "Order by value is not a property on the
+> configured collection".
 
-**Eval refuses to run with a different error** → paste the error verbatim into a new Claude
-conversation; that's usually enough to pinpoint it.
+> Umbraco 17 won't build: IPublishedSnapshotAccessor errors in the generated models.
 
-## Installing the skills (separate from evaluation)
+> Our pages show dictionary keys like `footer.copyright` instead of text since moving to v17.
 
-If you want to **use** these skills (rather than evaluate them), each folder is a complete,
-installable skill. Zip the folder and install via your usual Claude Code plugin/skill
-mechanism, or drop the folder into your `.ai-standards`-equivalent skills location.
+> Editors say YouTube embeds in the rich text editor stopped working after the upgrade.
 
-The bundled `evals/` directories don't interfere with normal skill use — they sit alongside
-SKILL.md and are only read by skill-evals.
+> Can I just copy our v13 Umbraco Forms templates into the v17 site?
 
-## What's in each skill
+Pasting the exact error message or symptom helps it pick the right skill and the right fix.
 
-### `umbraco-13-to-17/` (router)
-- SKILL.md, 2 reference files (pre-flight checklist, done checklist)
-- No bundled scripts — the router delegates to sub-skills
+### Or ask for a skill by name
 
-### `umbraco-13-to-17-backend/`
-- SKILL.md, 5 reference files:
-  - `csproj-net10-retarget.md` — package list, centralised versioning
-  - `program-cs-v17.md` — full v17 Program.cs shape with rationale
-  - `modelsbuilder-fixes.md` — IPublishedSnapshotAccessor → IPublishedContentTypeCache
-  - `appsettings-v17.md` — appsettings.json deltas vs v13
-  - `razor-source-generator-fix.md` — CS8785 duplicate hintName error
+If the assistant doesn't pick a skill up, or you want a specific one:
 
-### `umbraco-13-to-17-backoffice/`
-- SKILL.md, 3 reference files:
-  - `scss-and-partials.md` — blockpreview.scss, backoffice info colours, picker styles, `.umb-block-grid` cleanup
-  - `rte-config.md` — TipTap Word Count, toolbar, image sizing, Uploads folder
-  - `blocks-and-pickers.md` — BlockPreview on BlockList, backoffice info partials
+| Assistant | How to call a skill |
+|---|---|
+| Claude Code | `/umbraco-13-to-17` |
+| OpenAI Codex | `$umbraco-13-to-17` (or pick it from the skills selector) |
+| GitHub Copilot in VS Code | `/umbraco-13-to-17` in chat |
+| Cursor | Type `/` in Agent chat and search for the skill |
+| Gemini CLI | Describe the task; it asks to activate the matching skill. `/skills list` shows what's installed. |
 
-### `umbraco-13-to-17-frontend/`
-- SKILL.md, 3 reference files:
-  - `taghelpers-migration.md` — `<our-X>` → `<etch-cms-X>` and GetDictionaryValueOrDefault
-  - `views-and-csp.md` — nested-section BlockGrid fix, CIVIC cookie banner CSP
-  - `umbraco-forms.md` — Forms template merge
+Add your question after the name, e.g. `/umbraco-13-to-17-database uSync import is failing on
+templates`.
 
-### `umbraco-13-to-17-database/`
-- SKILL.md, 4 reference files:
-  - `usync-workflow.md` — full export-fix-import sequence
-  - `content-migration-gotchas.md` — visible-state bug, republish workaround, 3rd-party data types,
-    List View `orderBy` casing
-  - `template-import-order.md` — `_layout.config` prefix trick
-  - `nametemplate-rewrite.md` — AngularJS → UFM template syntax (also used for block labels)
-- `assets/_layout.config` — minimal layout template stub for the fresh-DB template import fix
-- `scripts/` — three ready-to-run PowerShell scripts:
-  - `fix-visible-property.ps1` (run on v13 side, pre-upgrade)
-  - `transform-mntp-filter-udis-to-guids.ps1` (run on v17 side, post-export)
-  - `fix-listview-orderby-casing.ps1` (run on v17 side, post-export)
+### Assistants without skill support
+
+Any assistant that can read files in your project can still use these. Point it at the file:
+
+> Read `.agents/skills/umbraco-13-to-17/SKILL.md` and follow it. We're starting a v13 → v17
+> upgrade of this site.
+
+It follows the links from there into the other skills and their reference files.
+
+## How an upgrade runs
+
+The starting skill (`umbraco-13-to-17`) walks you through this order. Doing the steps out of
+order wastes time, e.g. exporting uSync from a site that doesn't build yet gives you stale data.
+
+0. **Pre-flight, on v13.** Fix the "visible" block values in the v13 uSync content, branch off
+   `main`, audit which packages have v17 versions, back up the database.
+1. **Backend.** Retarget to .NET 10 and update packages until the site builds and boots.
+2. **ModelsBuilder.** Rebuild the models on v17.
+3. **Database and content.** Export uSync from v17, run the fix scripts, re-import, then
+   force a republish.
+4. **Backoffice and frontend.** Separate files, so two people can do these at the same time.
+5. **Verify.** Work through the done checklist before merging.
+
+If you're already part-way through, skip ahead: describe the symptom and the assistant goes
+straight to the skill that fixes it.
+
+## The PowerShell scripts
+
+The database skill ships three scripts in `umbraco-13-to-17-database/scripts/`. The assistant
+tells you when to run each one; you run them yourself, from the folder that contains your
+`uSync` folder (usually the web project).
+
+| Script | When | Works on |
+|---|---|---|
+| `fix-visible-property.ps1` | On the **v13** branch, before the upgrade | `uSync\v9\Content` |
+| `transform-mntp-filter-udis-to-guids.ps1` | On v17, after the uSync export | `uSync\v17\Content` |
+| `fix-listview-orderby-casing.ps1` | On v17, after the uSync export | `uSync\v17\DataTypes` |
+
+The folder paths are fixed inside each script, so check they match your project first. They need
+PowerShell (built into Windows; install [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell)
+on macOS or Linux and run them with `pwsh`). Commit before running them, so you can review the
+changes as a diff.
+
+## Good to know
+
+- **They're for upgrades, not new builds.** For a new v17 site, start from the latest Etch.Cms
+  v17 template.
+- **The assistant doesn't run the whole upgrade on its own.** Package versions, uSync imports
+  and the fix scripts all need a person watching and reviewing the diffs.
+- **Each skill has an `evals/` folder.** These are test prompts for whoever maintains the skills.
+  Assistants ignore them, and you can leave them out when installing.
