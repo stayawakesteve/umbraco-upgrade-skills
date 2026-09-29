@@ -118,9 +118,9 @@ SKILL.md and are only read by skill-evals.
 
 ### `umbraco-13-to-17-backoffice/`
 - SKILL.md, 3 reference files:
-  - `scss-and-partials.md` — blockpreview.scss, section partials, backoffice info colours, picker styles
+  - `scss-and-partials.md` — blockpreview.scss, backoffice info colours, picker styles, `.umb-block-grid` cleanup
   - `rte-config.md` — TipTap Word Count, toolbar, image sizing, Uploads folder
-  - `blocks-and-pickers.md` — BlockPreview, UFM labels, backoffice info partials, YouTube CSP
+  - `blocks-and-pickers.md` — BlockPreview on BlockList, backoffice info partials
 
 ### `umbraco-13-to-17-frontend/`
 - SKILL.md, 3 reference files:
@@ -134,7 +134,8 @@ SKILL.md and are only read by skill-evals.
   - `content-migration-gotchas.md` — visible-state bug, republish workaround, 3rd-party data types,
     List View `orderBy` casing
   - `template-import-order.md` — `_layout.config` prefix trick
-  - `nametemplate-rewrite.md` — AngularJS → UFM template syntax
+  - `nametemplate-rewrite.md` — AngularJS → UFM template syntax (also used for block labels)
+- `assets/_layout.config` — minimal layout template stub for the fresh-DB template import fix
 - `scripts/` — three ready-to-run PowerShell scripts:
   - `fix-visible-property.ps1` (run on v13 side, pre-upgrade)
   - `transform-mntp-filter-udis-to-guids.ps1` (run on v17 side, post-export)
