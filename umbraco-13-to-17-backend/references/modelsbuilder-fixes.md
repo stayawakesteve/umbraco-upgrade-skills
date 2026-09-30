@@ -52,15 +52,16 @@ checking):
   "DebugLevel": 0,
   "FlagOutOfDateModels": false,
   "IncludeVersionNumberInGeneratedModels": false,
-  "ModelsDirectory": "~/../Etch.CMS.Umbraco.Template.Models/Generated/",
+  "ModelsDirectory": "~/../MySite.Models/Generated/",
   "ModelsMode": "SourceCodeAuto",
-  "ModelsNamespace": "Etch.CMS.Umbraco.Template.Models.Generated"
+  "ModelsNamespace": "MySite.Models.Generated"
 }
 ```
 
 - `ModelsMode: SourceCodeAuto` — models are written to disk and regenerated automatically on schema
-  changes. Standard Etch setup.
+  changes.
 - `ModelsDirectory` points to the Models project's `Generated/` folder via a relative path.
+- `MySite.Models` is a placeholder — keep your site's existing Models project name and namespace.
 
 ## Verifying
 
@@ -72,7 +73,7 @@ dotnet build
 ```
 
 The build should succeed with no `IPublishedSnapshotAccessor` errors. If you go with Option B,
-verify the new generated files are in `Etch.CMS.Umbraco.Template.Models/Generated/`.
+verify the new generated files are in the Models project's `Generated/` folder.
 
 ## Edge cases
 

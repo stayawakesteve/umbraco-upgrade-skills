@@ -1,13 +1,12 @@
 ---
 name: umbraco-13-to-17-backoffice
 description: |
-  Migrates the editor-facing backoffice customisations of an Etch CMS site from Umbraco 13 to Umbraco 17.
+  Migrates the editor-facing backoffice customisations of an Umbraco site from Umbraco 13 to Umbraco 17.
   Use this skill for any RTE/TipTap, BlockPreview, block label, backoffice info, backoffice SCSS, or
   backoffice CSP work in a v13→v17 upgrade. Trigger on phrases like "v17 RTE config", "TipTap link
   picker", "BlockPreview broken on BlockList", "backoffice info partial", "backoffice info showing
-  grey", "block labels showing raw {{ }} syntax", "block grid looks wrong in the editor", "YouTube
-  embeds blocked in backoffice", or whenever a user mentions editor/backoffice symptoms in a v13→v17
-  context. Not for views, tag helpers, dictionary values or Umbraco Forms (umbraco-13-to-17-frontend),
+  grey", "block labels showing raw {{ }} syntax", "YouTube embeds blocked in backoffice", or whenever
+  a user mentions editor/backoffice symptoms in a v13→v17 context. Not for views, dictionary values or Umbraco Forms (umbraco-13-to-17-frontend),
   build errors (umbraco-13-to-17-backend), or uSync/content (umbraco-13-to-17-database).
 ---
 
@@ -16,7 +15,7 @@ description: |
 If an editor would notice it and a site visitor wouldn't, it belongs here. Other tracks are owned
 elsewhere:
 
-- Views, tag helpers, dictionary values, Umbraco Forms, frontend CSP → `umbraco-13-to-17-frontend`
+- Views, dictionary values, Umbraco Forms → `umbraco-13-to-17-frontend`
 - `.csproj`, `Program.cs`, build errors → `umbraco-13-to-17-backend`
 - uSync, content, data types → `umbraco-13-to-17-database`
 
@@ -24,8 +23,8 @@ elsewhere:
 
 These are roughly independent, but doing them in this order minimises rework:
 
-1. **Backoffice SCSS** — `blockpreview.scss`, backoffice info SCSS colours, picker
-   styles, removing `.umb-block-grid` from `editor.scss`, `.stylelintcache` in `.gitignore`.
+1. **Backoffice SCSS** — `blockpreview.scss`, backoffice info SCSS colours, `.stylelintcache` in
+   `.gitignore`.
    See `references/scss-and-partials.md`.
 2. **RTE config** — Word Count, toolbar layout, max image size, Uploads folder, Link Picker
    prop for TipTap. See `references/rte-config.md`.
@@ -34,12 +33,6 @@ These are roughly independent, but doing them in this order minimises rework:
    `references/blocks-and-pickers.md`.
 
 When your response draws on one of the reference files above, name it explicitly — e.g. "Full details in `references/rte-config.md`" — so the user knows where to look for more context.
-
-## The thing most people miss
-
-**`.umb-block-grid` rules left in `editor.scss` from v13 must be removed.** Otherwise the block grid
-editor renders incorrectly, which looks like a v17 bug rather than a leftover. See
-`references/scss-and-partials.md` §5.
 
 ## Block labels showing raw `{{ }}` syntax
 

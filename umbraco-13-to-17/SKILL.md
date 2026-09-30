@@ -1,17 +1,17 @@
 ---
 name: umbraco-13-to-17
 description: |
-  End-to-end orchestrator for upgrading an Etch CMS / Umbraco site from v13 to v17. Use this skill whenever
+  End-to-end orchestrator for upgrading an Umbraco site from v13 to v17. Use this skill whenever
   the user is starting, planning, or part-way through a v13→v17 upgrade and needs the big-picture sequence,
   or doesn't yet know which stage-specific sub-skill applies. Trigger on phrases like "upgrade Umbraco 13
-  to 17", "v13 to v17 migration", "upgrade Etch CMS to v17", "where do I start with the Umbraco
-  upgrade", or whenever a user names both v13 and v17 in the same request. Use this skill even when the user
-  has only vaguely indicated they want to upgrade — it provides the routing into the four specialised
-  sub-skills (`umbraco-13-to-17-backend`, `umbraco-13-to-17-database`, `umbraco-13-to-17-backoffice`,
+  to 17", "v13 to v17 migration", "where do I start with the Umbraco upgrade", or whenever a user names
+  both v13 and v17 in the same request. Use this skill even when the user has only vaguely indicated
+  they want to upgrade — it provides the routing into the four specialised sub-skills
+  (`umbraco-13-to-17-backend`, `umbraco-13-to-17-database`, `umbraco-13-to-17-backoffice`,
   `umbraco-13-to-17-frontend`).
 ---
 
-# Umbraco 13 → 17 Upgrade (Etch CMS)
+# Umbraco 13 → 17 Upgrade
 
 Your job: work out which stage the user is at, route them to the right sub-skill, and keep the big
 picture coherent.
@@ -42,7 +42,7 @@ yet — get a clean build first.
 
 ### Step 2 — Rebuild ModelsBuilder
 
-Once the site boots, do a clean ModelsBuilder build using the approach you chose in pre-flight §8. Then
+Once the site boots, do a clean ModelsBuilder build using the approach you chose in pre-flight §7. Then
 go to Step 3, whose workflow starts with the full uSync export from the v17 site against the v13 DB.
 Without that fresh export, Step 3 has nothing to fix.
 
@@ -50,7 +50,6 @@ Without that fresh export, Step 3 has nothing to fix.
 
 Hand off to **`umbraco-13-to-17-database`**. That skill covers:
 
-- The MNTP filter UDI → GUID transformation (`transform-mntp-filter-udis-to-guids.ps1`)
 - The `nameTemplate` AngularJS → UFM rewrite
 - The List View `orderBy` casing fix (`fix-listview-orderby-casing.ps1`)
 - Re-linking 3rd-party data types whose property editor changed (HubSpot Form Picker etc.)
@@ -62,17 +61,16 @@ Hand off to **`umbraco-13-to-17-database`**. That skill covers:
 **Backoffice** (the v17 backoffice is a Lit-based rewrite of the v13 editor UI) — hand off to
 **`umbraco-13-to-17-backoffice`**. That skill covers:
 
-- `blockpreview.scss`, backoffice info partials and SCSS, picker styles, `.umb-block-grid` cleanup
+- `blockpreview.scss`, backoffice info partials and SCSS
 - RTE config (Word Count, toolbar layout, image sizing, Uploads media folder), Link Picker prop for TipTap
 - BlockPreview disabled on BlockList, UFM block labels
 - YouTube backoffice CSP fix
 
 **Frontend** — hand off to **`umbraco-13-to-17-frontend`**. That skill covers:
 
-- `<our-X>` → `<etch-cms-X>` tag rewrites and the latest Etch.Cms.Umbraco.TagHelpers
 - `@Umbraco.GetDictionaryValue` → `@Umbraco.GetDictionaryValueOrDefault`
 - The nested-section BlockGrid frontend fix
-- Umbraco Forms template merge and the CIVIC cookie banner CSP rule
+- Umbraco Forms template merge
 
 Steps 3 and 4, and the two halves of Step 4, all touch different files, so with a second pair of hands
 they can run in parallel. Solo, do Step 3 first because content issues block QA. Within Step 4, do the frontend
@@ -90,7 +88,7 @@ If the user says something like "my templates aren't importing" or "blocks are s
 - Build errors, missing namespaces, package conflicts → `umbraco-13-to-17-backend`
 - uSync import failures, missing content, wrong visibility, template not found, List View `orderBy` errors → `umbraco-13-to-17-database`
 - Editor-facing: RTE/TipTap, block previews or labels, backoffice info, backoffice SCSS, YouTube in the RTE → `umbraco-13-to-17-backoffice`
-- Visitor-facing: tag helpers, dictionary keys on the page, nested sections, Forms, cookie banner → `umbraco-13-to-17-frontend`
+- Visitor-facing: dictionary keys on the page, nested sections, Forms → `umbraco-13-to-17-frontend`
 
 ## Things this skill deliberately does NOT do
 
@@ -100,7 +98,7 @@ If the user says something like "my templates aren't importing" or "blocks are s
 - **Doesn't migrate content automatically.** uSync export/import is a manual, supervised process —
   the scripts fix specific bugs, but you still need to eyeball the diffs.
 - **Doesn't cover greenfield v17 setup.** This is for *upgrading* an existing v13 site. For a new build
-  use the latest Etch.Cms v17 template directly.
+  start from a fresh Umbraco 17 install.
 
 ## Reference files
 

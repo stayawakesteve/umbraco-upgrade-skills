@@ -1,6 +1,6 @@
 # Umbraco 13 → 17 upgrade skills
 
-Five agent skills that guide an AI coding assistant through upgrading an Etch CMS site from
+Five agent skills that guide an AI coding assistant through upgrading an Umbraco site from
 Umbraco 13 (.NET 8) to Umbraco 17 (.NET 10). They cover the build, the database and uSync
 content, the backoffice, and the frontend views, including the known v17 migration bugs and
 their fixes.
@@ -15,9 +15,9 @@ GitHub Copilot in VS Code, Cursor, Gemini CLI and others. Nothing in them is tie
 |---|---|
 | `umbraco-13-to-17` | **Start here.** The overall upgrade order, and routing to the right sub-skill. |
 | `umbraco-13-to-17-backend` | Getting the site to build and boot: `.csproj` → `net10.0`, NuGet packages, `Program.cs`, ModelsBuilder errors, `appsettings.json`. |
-| `umbraco-13-to-17-database` | uSync export/fix/import, missing or hidden content, template import failures, data types. Includes three PowerShell fix scripts. |
+| `umbraco-13-to-17-database` | uSync export/fix/import, missing or hidden content, template import failures, data types. Includes two PowerShell fix scripts. |
 | `umbraco-13-to-17-backoffice` | What editors see: RTE/TipTap config, BlockPreview, block labels, backoffice styles, YouTube embeds in the RTE. |
-| `umbraco-13-to-17-frontend` | What visitors see: `<our-X>` → `<etch-cms-X>` tag helpers, dictionary values, nested sections, Umbraco Forms templates, cookie banner CSP. |
+| `umbraco-13-to-17-frontend` | What visitors see: dictionary values, nested sections, Umbraco Forms templates. |
 
 The skills point to each other by name, so **install all five together**.
 
@@ -129,14 +129,13 @@ straight to the skill that fixes it.
 
 ## The PowerShell scripts
 
-The database skill ships three scripts in `umbraco-13-to-17-database/scripts/`. The assistant
+The database skill ships two scripts in `umbraco-13-to-17-database/scripts/`. The assistant
 tells you when to run each one; you run them yourself, from the folder that contains your
 `uSync` folder (usually the web project).
 
 | Script | When | Works on |
 |---|---|---|
 | `fix-visible-property.ps1` | On the **v13** branch, before the upgrade | `uSync\v9\Content` |
-| `transform-mntp-filter-udis-to-guids.ps1` | On v17, after the uSync export | `uSync\v17\Content` |
 | `fix-listview-orderby-casing.ps1` | On v17, after the uSync export | `uSync\v17\DataTypes` |
 
 The folder paths are fixed inside each script, so check they match your project first. They need
@@ -146,8 +145,8 @@ changes as a diff.
 
 ## Good to know
 
-- **They're for upgrades, not new builds.** For a new v17 site, start from the latest Etch.Cms
-  v17 template.
+- **They're for upgrades, not new builds.** For a new v17 site, start from a fresh Umbraco 17
+  install.
 - **The assistant doesn't run the whole upgrade on its own.** Package versions, uSync imports
   and the fix scripts all need a person watching and reviewing the diffs.
 - **Each skill has an `evals/` folder.** These are test prompts for whoever maintains the skills.

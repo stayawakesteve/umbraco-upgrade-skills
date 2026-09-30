@@ -46,7 +46,7 @@ Views/Partials/Forms/Themes/default/
 └── ...
 ```
 
-If the site has a custom Forms theme (e.g. `Views/Partials/Forms/Themes/etch-default/`), apply the
+If the site has a custom Forms theme (e.g. `Views/Partials/Forms/Themes/my-theme/`), apply the
 same merge process to that theme's templates.
 
 ## Verifying

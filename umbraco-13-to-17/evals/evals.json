@@ -3,8 +3,8 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I've just been put on the [Client] site upgrade — moving it from Umbraco 13 to v17. Where do I start? This is a fairly standard Etch CMS site, nothing too custom. I have a fresh checkout of main on my machine.",
-      "expected_output": "Walks through the canonical sequence: pre-flight (run fix-visible-property.ps1 on v13 side, branch off main, package audit), then backend retarget, then ModelsBuilder rebuild + full uSync export, then DB/content migration (with the UDI→GUID transform and republish workaround), then backoffice and frontend (can run in parallel), then verify. Should route to specific sub-skills for each stage rather than trying to explain everything inline. Should emphasise doing the v13-side visible-property fix BEFORE upgrading.",
+      "prompt": "I've just been put on the [Client] site upgrade — moving it from Umbraco 13 to v17. Where do I start? This is a fairly standard Umbraco site, nothing too custom. I have a fresh checkout of main on my machine.",
+      "expected_output": "Walks through the canonical sequence: pre-flight (run fix-visible-property.ps1 on v13 side, branch off main, package audit), then backend retarget, then ModelsBuilder rebuild + full uSync export, then DB/content migration (with the fix scripts and republish workaround), then backoffice and frontend (can run in parallel), then verify. Should route to specific sub-skills for each stage rather than trying to explain everything inline. Should emphasise doing the v13-side visible-property fix BEFORE upgrading.",
       "files": [],
       "expectations": [
         "Mentions running fix-visible-property.ps1 on the v13 side BEFORE branching or upgrading",
@@ -32,14 +32,14 @@
     },
     {
       "id": 3,
-      "prompt": "We're planning the Umbraco upgrade for next sprint. Can you give me a rough sense of how the work splits up so I can estimate it? The site is Etch.Cms-based, currently on v13, target is v17.",
-      "expected_output": "Describes the four-track split: backend (csproj retarget to net10, packages, Program.cs, ModelsBuilder, RazorSourceGenerator fix), DB/content (uSync export-fix-import dance with the PowerShell fix scripts, force-republish workaround, master template ordering trick), backoffice (RTE/TipTap config, BlockPreview, UFM block labels, backoffice info SCSS, YouTube CSP), and frontend (tag helper rename, dictionary helper change, nested-section fix, Umbraco Forms template merge). Mentions that step ordering matters (e.g. uSync export only after the site compiles and boots). Useful for estimation.",
+      "prompt": "We're planning the Umbraco upgrade for next sprint. Can you give me a rough sense of how the work splits up so I can estimate it? The site is currently on v13, target is v17.",
+      "expected_output": "Describes the four-track split: backend (csproj retarget to net10, packages, Program.cs, ModelsBuilder, RazorSourceGenerator fix), DB/content (uSync export-fix-import dance with the PowerShell fix scripts, force-republish workaround, master template ordering trick), backoffice (RTE/TipTap config, BlockPreview, UFM block labels, backoffice info SCSS, YouTube CSP), and frontend (dictionary helper change, nested-section fix, Umbraco Forms template merge). Mentions that step ordering matters (e.g. uSync export only after the site compiles and boots). Useful for estimation.",
       "files": [],
       "expectations": [
         "Describes four distinct tracks: backend, DB/content, backoffice, and frontend",
         "Backend track includes: .csproj retarget to net10.0, package updates, Program.cs changes, ModelsBuilder fix, and RazorSourceGenerator fix",
         "Backoffice track includes: RTE/TipTap config, BlockPreview, and backoffice SCSS or backoffice info partials",
-        "Frontend track includes: tag helper rename (our-X to etch-cms-X), the GetDictionaryValueOrDefault change, and Umbraco Forms template merge",
+        "Frontend track includes: the GetDictionaryValueOrDefault change, the nested-section fix, and Umbraco Forms template merge",
         "DB/content track includes: uSync export-fix-import dance with PowerShell scripts and the force-republish workaround",
         "States that step ordering matters — specifically that uSync export only happens after site compiles and boots"
       ]
@@ -59,14 +59,12 @@
     {
       "id": 5,
       "prompt": "Done with the Umbraco upgrade — site builds, boots, all the content seems to migrate fine, RTE looks good. About to merge feature/v17 to main. Anything I should double-check before doing that?",
-      "expected_output": "Walks through the done-checklist concerns: build is clean with no RazorSourceGenerator warnings, all CS8785 warnings cleared, content visibility states correct, MNTP filter properties resolving, templates appearing (no fall-through to 404), backoffice info partials rendering, no remaining <our-X> tags, GetDictionaryValue replaced with GetDictionaryValueOrDefault, BlockPreview disabled for BlockList, CSP console-clean, YouTube embeds work in backoffice, Forms submit end-to-end. Points to done-checklist.md.",
+      "expected_output": "Walks through the done-checklist concerns: build is clean with no RazorSourceGenerator warnings, all CS8785 warnings cleared, content visibility states correct, templates appearing (no fall-through to 404), backoffice info partials rendering, GetDictionaryValue replaced with GetDictionaryValueOrDefault, BlockPreview disabled for BlockList, CSP console-clean, YouTube embeds work in backoffice, Forms submit end-to-end. Points to done-checklist.md.",
       "files": [],
       "expectations": [
         "References done-checklist.md or provides checks clearly derived from it",
         "Mentions CS8785 RazorSourceGenerator hintName warnings must all be clear before merging",
         "Mentions content visibility states must be verified (blocks/nodes correctly shown or hidden)",
-        "Mentions MNTP filter properties resolving correctly (UDI to GUID transform worked)",
-        "Mentions <our-X> tags — all migrated to <etch-cms-X> or none remaining",
         "Mentions GetDictionaryValue must be replaced with GetDictionaryValueOrDefault",
         "Mentions CSP console-clean check (no CSP errors on frontend)",
         "Mentions BlockPreview disabled for BlockList"

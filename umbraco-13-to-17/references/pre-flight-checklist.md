@@ -36,30 +36,25 @@ Open the v13 `.csproj` and for each `PackageReference`:
 
 Write the audit down somewhere visible (PR description, Notion page). You will refer back to it.
 
-### 4. Confirm Etch CMS package versions
-
-The internal `Etch.Cms.Umbraco.*` packages all have v17 releases. Note the version you're targeting
-and confirm the `Etch.Cms.Libraries` checkout (if using ProjectReferences) is on the right branch.
-
 ## Environment
 
-### 5. Confirm `.NET 10` SDK is installed
+### 4. Confirm `.NET 10` SDK is installed
 
 v17 targets `net10.0`. `dotnet --list-sdks` should show a 10.x SDK. If not, install before retargeting
 or every build will fail mysteriously.
 
-### 6. Backup the database
+### 5. Backup the database
 
 Even with uSync handling content migration, take a SQL backup of the v13 DB *before* you point a v17
 build at it. The v17 boot will perform schema migrations that cannot be reversed.
 
 ## Tooling
 
-### 7. PowerShell available
+### 6. PowerShell available
 
 The fix scripts in `umbraco-13-to-17-database/scripts/` are PowerShell, not bash. Make sure whoever's running the upgrade has PowerShell installed.
 
-### 8. ModelsBuilder strategy
+### 7. ModelsBuilder strategy
 
 Decide upfront which fix you'll use when `IPublishedSnapshotAccessor` references break the build —
 mass-replace in the generated files, or delete and regenerate. The options and when to pick each are

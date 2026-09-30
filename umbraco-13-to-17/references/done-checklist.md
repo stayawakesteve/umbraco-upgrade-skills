@@ -21,7 +21,6 @@ into `main`.
       messages in backoffice
 - [ ] 3rd-party data type linkages (HubSpot Form Picker, etc.) all resolved
 - [ ] Templates show up in the backoffice (no fall-through to `/404`)
-- [ ] MNTP filter properties resolve correctly (the UDI → GUID transform worked)
 - [ ] Media library and other List View nodes open without an `orderBy` toast error
 
 ## Backoffice
@@ -33,16 +32,13 @@ into `main`.
 
 ## Frontend
 
-- [ ] No `<our-X>` tags remain — all migrated to `<etch-cms-X>` (or knowingly left)
 - [ ] `@Umbraco.GetDictionaryValue` calls all migrated to `GetDictionaryValueOrDefault`
-- [ ] `<etch-cms-img>` sizing parameters match current Etch.Cms.Umbraco.TagHelpers docs
 - [ ] Nested sections render without extra wrapper divs
 
 ## CSP / security
 
 - [ ] No CSP console errors on frontend
 - [ ] YouTube embeds work in the backoffice (Referrer-Policy override present in `Program.cs`)
-- [ ] CIVIC cookie banner still loads (unsafe-inline style-src kept)
 
 ## Forms
 

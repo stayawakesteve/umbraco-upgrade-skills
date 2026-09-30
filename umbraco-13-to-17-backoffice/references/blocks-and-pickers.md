@@ -23,7 +23,7 @@ In `appsettings.json`:
 
 ## 2. Backoffice info partials on all blocks
 
-For older Etch.Cms sites where backoffice info partials were only applied to *some* block types
+For older sites where backoffice info partials were only applied to *some* block types
 (typically just Section), v17 expects them on all blocks for consistency.
 
 In each block component partial (e.g. `Views/Partials/blockgrid/Components/MyBlock.cshtml`):
@@ -39,4 +39,4 @@ You'll need to do this manually per block. Without it, blocks render in the back
 the helpful "this is a Foo block, properties X Y Z" info that editors rely on.
 
 The nested-section rendering fix in `SectionContent.cshtml` is a frontend change — see
-`umbraco-13-to-17-frontend` → `references/views-and-csp.md`.
+`umbraco-13-to-17-frontend` → `references/views.md`.

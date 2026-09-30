@@ -41,13 +41,13 @@ No version. The version comes from `Directory.Packages.props` at the solution ro
 </Project>
 ```
 
-If the v13 solution doesn't have one, decide whether to introduce it now (recommended) or migrate later. The v17
-Etch template *expects* it — keeping inline versions will work but creates drift.
+If the v13 solution doesn't have one, decide whether to introduce it now (recommended) or migrate later. Keeping inline versions will
+work but creates drift across projects in the solution.
 
 ## Step 3: The v17 package list (canonical)
 
-This is the set of packages a vanilla v17 Etch.Cms.Umbraco.Template project pulls in. Use it as
-the target shape — your site may add more, but it should at least include these:
+This is the set of packages a typical v17 site pulls in. Use it as the target shape — your site
+may add or drop some, but check each one it already references has a v17 version:
 
 ### Core Umbraco + community
 
@@ -87,30 +87,6 @@ Include the providers the client is using — you can drop unused ones, but the 
 <PackageReference Include="uSync.Forms" />
 <PackageReference Include="uSync.PeopleEdition" />
 ```
-
-### Etch CMS libraries
-
-For consumed-via-NuGet sites:
-
-```xml
-<PackageReference Include="Etch.Cms.Umbraco.Blog" />
-<PackageReference Include="Etch.Cms.Umbraco.Civic" />
-<PackageReference Include="Etch.Cms.Umbraco.ContentBlocks" />
-<PackageReference Include="Etch.Cms.Umbraco.Core" />
-<PackageReference Include="Etch.Cms.Umbraco.Core.Mvc" />
-<PackageReference Include="Etch.Cms.Umbraco.Core.Mvc.StaticGeneration" />
-<PackageReference Include="Etch.Cms.Umbraco.Listings" />
-<PackageReference Include="Etch.Cms.Umbraco.Middleware" />
-<PackageReference Include="Etch.Cms.Umbraco.Robots" />
-<PackageReference Include="Etch.Cms.Umbraco.Schema" />
-<PackageReference Include="Etch.Cms.Umbraco.SecurityHeaders" />
-<PackageReference Include="Etch.Cms.Umbraco.Sitemap" />
-<PackageReference Include="Etch.Cms.Umbraco.TagHelpers" />
-```
-
-For solutions consuming Etch.Cms.Libraries via ProjectReference, the section above is commented out
-and a block of `<ProjectReference Include="..\..\..\..\..\Etch.Cms.Libraries\src\...\*.csproj" />`
-entries are present instead. Pick one model — don't mix.
 
 ### Other commonly-needed packages
 
@@ -154,19 +130,9 @@ Plus the nginx config files:
 </ItemGroup>
 ```
 
-## Step 4: Etch.Cms.PropertyEditors
+## Step 4: Static content includes
 
-If the v13 site used the custom repository-based MNTP property editor, keep these (and remember
-the UDI → GUID transform in `umbraco-13-to-17-database`):
-
-```xml
-<PackageReference Include="Etch.Cms.Umbraco.PropertyEditors.RepositoryBasedMntp" />
-<PackageReference Include="Etch.Cms.Umbraco.PropertyEditors.RepositoryBasedMntp.Usync" />
-```
-
-## Step 5: Static content includes
-
-These haven't changed but are easy to miss when copying from the v17 template:
+These haven't changed but are easy to miss when comparing against a fresh v17 project:
 
 ```xml
 <ItemGroup>

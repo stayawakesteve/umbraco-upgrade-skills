@@ -11,9 +11,9 @@ For every Rich Text data type in the site (Settings → Data Types → filter by
 Tick the "Word Count" option in the data type config. Editors expect this — it's off by default in
 v17 even though it was usually on in v13.
 
-### 2. Use the standard Etch toolbar layout
+### 2. Use one standard toolbar layout
 
-The toolbar layout differs between TinyMCE (v13) and TipTap (v17). The canonical Etch v17 toolbar
+The toolbar layout differs between TinyMCE (v13) and TipTap (v17). A good baseline v17 toolbar
 includes:
 
 - Format selector (paragraph, headings)
@@ -24,13 +24,13 @@ includes:
 - HR (horizontal rule)
 - Source code view
 
-The exact layout is documented in screenshots in the Notion v17 upgrade notes. The principle:
-**don't try to recreate v13's TinyMCE toolbar one-for-one** — some controls don't map cleanly, and
-TipTap has different idioms. Pick the Etch standard layout and apply it everywhere.
+The principle: **don't try to recreate v13's TinyMCE toolbar one-for-one** — some controls don't map
+cleanly, and TipTap has different idioms. Pick one standard layout and apply it to every RTE data
+type.
 
 ### 3. Maximum size for inserted images: `1280`
 
-Set in the data type config under "Image upload size". 1280 is the Etch standard — it balances quality
+Set in the data type config under "Image upload size". 1280 is a sensible default — it balances quality
 against page weight, and matches the largest breakpoint in the standard responsive image set.
 
 ### 4. Image Upload Folder = "Uploads"
@@ -46,8 +46,8 @@ editors. The `Uploads` folder is the agreed staging area for RTE-uploaded media.
 ### Link Picker prop for TipTap
 
 To enable buttons (well-styled CTA-style links) inside TipTap, the project needs a Link Picker
-property registered. Refer to the v17 Etch.Cms template for the canonical implementation — it
-involves a custom property editor manifest.
+property registered. Refer to your v17 starter template or reference project for the
+implementation — it involves a custom property editor manifest.
 
 Without this, editors can't insert anything richer than a plain `<a>` link. Buttons in body content
 revert to looking like raw links.
@@ -86,7 +86,7 @@ need watching:
 
 For each RTE data type:
 
-1. Open the data type config and confirm: Word Count on, Etch toolbar layout, max image 1280,
+1. Open the data type config and confirm: Word Count on, standard toolbar layout, max image 1280,
    Uploads folder set
 2. Open a content node using that data type and verify the editor loads with the expected toolbar
 3. Try inserting an image — confirm it lands in the `Uploads` folder

@@ -22,25 +22,6 @@ before continuing (usually a specific data type is causing issues; check the log
 
 ## Step 2: Apply the fix scripts to the exported files
 
-### UDI → GUID for MNTP filters
-
-The custom repository-based MNTP property editor stored node references as Umbraco UDIs
-(`umb://document/<32-char-hex>`) in v13. The v17 document picker uses plain GUIDs in dashed format
-(`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`).
-
-```powershell
-.\scripts\transform-mntp-filter-udis-to-guids.ps1
-```
-
-The script targets `uSync\v17\Content` (hardcoded path — confirm yours matches before running).
-It only touches references inside `<filters>...</filters>` sections; other UDI references (e.g. for
-content pickers using the standard editor) must be left alone.
-
-Spot-check a few of the modified files to confirm the transformation looks right — the regex
-expects 32-char hex UDIs, so anomalous inputs (e.g. broken UDIs in the source data) may not match.
-If MNTP filters still return no results, check the filter uses the repository-based MNTP — the
-standard MNTP isn't affected.
-
 ### `nameTemplate` UFM rewrite
 
 Not a bundled script — see `references/nametemplate-rewrite.md` for the find/replace patterns and the

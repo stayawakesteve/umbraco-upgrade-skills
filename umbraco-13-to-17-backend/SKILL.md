@@ -1,7 +1,7 @@
 ---
 name: umbraco-13-to-17-backend
 description: |
-  Migrates the backend/codebase of an Etch CMS site from Umbraco 13 (.NET 8) to Umbraco 17 (.NET 10).
+  Migrates the backend/codebase of an Umbraco site from Umbraco 13 (.NET 8) to Umbraco 17 (.NET 10).
   Use this skill for any C# / project-file / configuration work in a v13→v17 upgrade: retargeting the
   .csproj to net10.0, updating NuGet packages to v17-compatible versions, rewriting Program.cs (including
   the new Contentment registration), fixing ModelsBuilder generated files that reference
@@ -30,8 +30,8 @@ Do these in order:
 
 When your response draws on one of these files, name it explicitly — e.g. "Full details in `references/modelsbuilder-fixes.md`" — so the user knows where to look for more context.
 
-If you see a build error not covered by one of the above, search the v17 Etch.Cms.Umbraco.Template
-files (Program.cs, .csproj, appsettings.json) — there's likely a pattern you're missing.
+If you see a build error not covered by one of the above, compare against a fresh Umbraco 17
+project (Program.cs, .csproj, appsettings.json) — there's likely a pattern you're missing.
 
 ## The four breaking changes most likely to catch you
 
@@ -45,7 +45,7 @@ mass-replace it with `IPublishedContentTypeCache` or delete and regenerate the m
 
 In v13, adding the Contentment package was enough. In v17 you must chain `.AddContentment(...)` onto
 the Umbraco builder in `Program.cs`. Skip it and Contentment silently breaks at runtime (data types
-using it can't be resolved). The Etch-standard options are in `references/program-cs-v17.md` §1.
+using it can't be resolved). The recommended options are in `references/program-cs-v17.md` §1.
 
 This is the **canonical example** of "updated packages may have different requirements". Treat it as
 a warning sign: when you see a package version jump, check the release notes for new registration
@@ -72,4 +72,4 @@ alternative — don't try to force the version.
 - Site boots when you run it: backoffice loads at `/umbraco`, no boot errors in the log
 - ModelsBuilder rebuilds cleanly (no `IPublishedSnapshotAccessor` errors)
 
-You'll still have content issues, missing tag helpers, broken styles — that's expected.
+You'll still have content issues, broken views and styles — that's expected.

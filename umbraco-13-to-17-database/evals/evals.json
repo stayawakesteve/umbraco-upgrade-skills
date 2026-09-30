@@ -20,7 +20,7 @@
       "prompt": "Working on the v13→v17 upgrade. The site is now compiling and booting against the v13 DB, ModelsBuilder is clean. I think I'm ready to start the uSync export step. What's the right order — what scripts do I need to run and when?",
       "assertions": [
         "States the first step is a full uSync export from v17 writing fresh files to uSync/v17/",
-        "Says to run transform-mntp-filter-udis-to-guids.ps1 after export (MNTP UDI to GUID transform) and that it only touches references inside <filters> sections",
+        "Says to run fix-listview-orderby-casing.ps1 after export against uSync/v17/DataTypes",
         "Mentions fixing nameTemplate AngularJS syntax to UFM in the exported uSync data type files",
         "Includes the force-republish workaround as a step: delete home node + uSync re-import",
         "Notes that fix-visible-property.ps1 should already have been run on v13 before this stage (pre-flight)",

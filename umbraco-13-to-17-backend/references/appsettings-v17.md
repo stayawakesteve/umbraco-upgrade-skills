@@ -7,12 +7,6 @@
 Must be `false` in v17 (BlockGrid stays enabled). The config block and the reason live in
 `umbraco-13-to-17-backoffice` → `references/blocks-and-pickers.md` §1.
 
-### `Etch.Cms.Umbraco.TagHelpers.OurIMG`
-
-Keep the key named `OurIMG` despite the `<our-img>` → `<etch-cms-img>` rename, because the package
-looks it up by that name — renaming it breaks tag helper config. The config block is in
-`umbraco-13-to-17-frontend` → `references/taghelpers-migration.md` Step 5.
-
 ### `uSync.Publisher` settings
 
 v17 uSync uses an `AppId` / `AppKey` pair instead of older auth styles:
@@ -61,14 +55,14 @@ Notes:
 ```
 
 The `RichText.DataTypeId` is a specific GUID pointing at the data type used for Forms rich text
-fields. This GUID is the same across Etch v17 installs (it's the Etch-curated TipTap config).
+fields. It must match the key of an existing rich text (TipTap) data type in the site — check it
+after the uSync import.
 
 ## Sections that are unchanged from v13
 
 These work identically in v17 — no migration needed, but worth confirming they're present:
 
 - `Serilog` minimum levels and `UmbracoFile` write target
-- `Etch.TrailingSlashes.Keep: true`
 - `Umbraco.CMS.Content.LoginBackgroundImage`, `LoginLogoImage`, `LoginLogoImageAlternative`
 - `Umbraco.CMS.Examine.LuceneDirectoryFactory: "SyncedTempFileSystemDirectoryFactory"` —
   required for Azure App Service deployments
@@ -81,9 +75,9 @@ These work identically in v17 — no migration needed, but worth confirming they
 - `ModelsBuilder` settings (covered separately in `modelsbuilder-fixes.md`)
 - `Umbraco.Storage.AzureBlob.Media` connection string config
 
-## Sections to confirm are present (template-specific)
+## Sections to confirm are present
 
-The v17 Etch template sets these — older v13 sites may not have them:
+A fresh v17 install sets these — older v13 sites may not have them:
 
 ```json
 "Umbraco": {

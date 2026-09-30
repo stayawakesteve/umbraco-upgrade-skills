@@ -3,24 +3,7 @@
 ## Canonical structure
 
 ```csharp
-using Etch.Cms.Umbraco.Blog.Extensions;
-using Etch.Cms.Umbraco.Civic.Extensions;
-using Etch.Cms.Umbraco.ContentBlocks.Extensions;
-using Etch.Cms.Umbraco.Core.Extensions;
-using Etch.Cms.Umbraco.Core.Features.ApplicationInsights;
-using Etch.Cms.Umbraco.Core.Mvc.Extensions;
-using Etch.Cms.Umbraco.Core.Mvc.StaticGeneration.Models;
-using Etch.Cms.Umbraco.Listings.Extensions;
-using Etch.Cms.Umbraco.Middleware.Middlewares;
-using Etch.Cms.Umbraco.SecurityHeaders.DeveloperPageExceptionFilters;
-using Etch.Cms.Umbraco.SecurityHeaders.Extensions;
-using Etch.Cms.Umbraco.Sitemap.Extensions;
-using Etch.CMS.Umbraco.Template.Core.Constants;
-using Etch.CMS.Umbraco.Template.Models.Generated;
-using Microsoft.AspNetCore.Diagnostics;
-using OpenTelemetry.Trace;
 using Microsoft.AspNetCore.HttpOverrides;
-using System.Globalization;
 using Vite.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,9 +18,17 @@ var umbracobuilder = builder.CreateUmbracoBuilder()
 var services = umbracobuilder.Services;
 var env = builder.Environment;
 var configuration = builder.Configuration;
+
+// ... conditional registrations (see below) ...
+
+umbracobuilder.Build();
 ```
 
-## The five things to get right
+Keep any site-specific registrations your v13 `Program.cs` had (custom composers, extension
+methods from your own or third-party packages) — check each package's v17 release notes for
+changed registration calls.
+
+## The four things to get right
 
 ### 1. `.AddContentment(...)` on the Umbraco builder
 
@@ -45,7 +36,7 @@ This is new in v17. Without it, Contentment data types silently fail at runtime 
 will show "Property editor with alias … not found" for any data type that uses Contentment. It's the
 most common source of "data type missing" errors after migration.
 
-The Etch standard options (as in the canonical structure above):
+The options in the canonical structure above:
 
 - `DisableTree = false` — keep the Contentment tree visible in Settings
 - `DisableTelemetry = true` — opt out of usage telemetry
@@ -55,56 +46,23 @@ This sits in the same fluent chain as `AddBackOffice()`, `AddWebsite()`, etc. �
 
 ### 2. Azure Blob Storage gating
 
-The condition for adding Azure Blob media is environment-aware:
+Register Azure Blob media conditionally, so local development keeps using the local file system:
 
 ```csharp
-if (!env.IsDevelopment() && (!env.IsEnvironment(EnvironmentsConstants.LocalProd)
-    || configuration.GetSection("Etch:StorageEmulator").Value == "true"))
+if (!env.IsDevelopment())
 {
     umbracobuilder.AddAzureBlobMediaFileSystem();
 }
 ```
 
-In plain English: enable Azure Blob unless we're in Development, OR we're in LocalProd without the
-storage emulator. The LocalProd carve-out lets devs test prod-like config without needing real Azure.
+If your v13 site had a more specific condition (e.g. a prod-like local environment that opts out
+unless a storage emulator is configured), carry it across unchanged.
 
-### 3. `EtchCmsCore` configuration
+### 3. YouTube backoffice CSP middleware
 
-The fluent `.AddEtchCmsCore(...)` block is where most Etch-specific setup goes:
-
-```csharp
-umbracobuilder.AddEtchCmsCore(configure =>
-{
-    configure.ConfigureExamine(examine => examine.Exclude("content"));
-    configure.AddSitemap(configureSitemap => { });
-    configure.AddListings(configureListings =>
-    {
-        configureListings.AddBlog(configurator => { });
-        configureListings.UseUmbracoRepositoryFilterService();
-    });
-    configure.AddCivic(civic => { });
-    configure.AddContentBlocks();
-    configure.AddStaticGeneration(staticGenerationConfigurator =>
-        staticGenerationConfigurator.AddStaticGeneratedDocumentType(
-            nameof(ThemeSettings).ToLower(CultureInfo.InvariantCulture),
-            new StaticGenerationDefinition() { Extension = "css", ViewName = $"{nameof(ThemeSettings)}Static" }));
-    configure.AddMVC(env.IsDevelopment());
-});
-```
-
-Items to verify when migrating from v13:
-
-- `ConfigureExamine` excludes `"content"` — keeps the content index off (Etch convention)
-- `UseUmbracoRepositoryFilterService()` is the repository-based filter for listings — required if
-  the site uses repository-based MNTP filtering
-- `AddStaticGeneration` registers ThemeSettings static CSS generation; keep this exactly as shown
-  unless the site doesn't use ThemeSettings
-- `AddMVC(env.IsDevelopment())` — passing the env flag toggles dev-only routes
-
-### 4. YouTube backoffice CSP middleware
-
-Without this, YouTube embeds in the backoffice TipTap RTE fail with a CSP/referrer error. Add it after
-`UseFrontEndSecurityHeaders`, otherwise the referrer override has no effect:
+Without this, YouTube embeds in the backoffice TipTap RTE fail with a CSP/referrer error. Add it
+after any middleware that sets security headers (e.g. a CSP / security-headers package), otherwise
+the referrer override has no effect:
 
 ```csharp
 // Override referrer policy for backoffice to allow YouTube embeds
@@ -122,8 +80,7 @@ app.Use(async (context, next) =>
 });
 ```
 
-
-### 5. ForwardedHeaders + ApplicationInsights + OpenTelemetry
+### 4. ForwardedHeaders + ApplicationInsights
 
 ```csharp
 services.Configure<ForwardedHeadersOptions>(options =>
@@ -138,23 +95,19 @@ services.Configure<ForwardedHeadersOptions>(options =>
 if (!env.IsDevelopment())
 {
     services.AddApplicationInsightsTelemetry();
-    services.AddOpenTelemetry().WithTracing(b => b.AddProcessor<NotFoundTelemetryProcessor>());
 }
 else
 {
     services.AddOpenApiDocument(document =>
     {
-        document.DocumentName = "Etch.CMS.Umbraco.Template API";
-        document.Title = "Etch.CMS.Umbraco.Template API";
-        document.Description = "Etch.CMS.Umbraco.Template API";
+        document.DocumentName = "My Site API";
+        document.Title = "My Site API";
     });
 }
 ```
 
-`NotFoundTelemetryProcessor` filters 404s out of OpenTelemetry traces (without it tracing still works but
-floods App Insights with 404 noise) — comes from
-`Etch.Cms.Umbraco.Core.Features.ApplicationInsights`. The OpenApi block runs only in dev so Swagger
-is available at `/swagger`.
+The OpenApi block (NSwag) runs only in dev so Swagger is available at `/swagger`. Rename the
+document to suit the site.
 
 ## The pipeline
 
@@ -171,18 +124,12 @@ if (env.IsDevelopment())
 }
 
 app.UseForwardedHeaders();
-app.UseMiddleware<ManageTrailingSlashMiddleware>();
 app.UseHttpsRedirection();
 app.UseHsts();
 
-app.UseFrontEndSecurityHeaders(configureCsp: builder =>
-    // UnsafeInline required for CIVIC
-    builder.AddStyleSrc()
-        .UnsafeInline()
-        .OverHttps()
-        .Self());
+// (Any security-headers / CSP middleware your site uses goes here)
 
-// (Backoffice referrer policy middleware here — see #4 above)
+// (Backoffice referrer policy middleware here — see #3 above)
 
 app.UseUmbraco()
     .WithMiddleware(u =>

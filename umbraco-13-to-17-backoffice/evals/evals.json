@@ -40,13 +40,13 @@
     },
     {
       "id": 4,
-      "prompt": "Working through the v17 SCSS migration. I've imported blockpreview.scss from the v17 template. What else am I missing? The backoffice info partials look unstyled — they're showing in grey instead of our brand colour, and our block grid in the editor looks weird too.",
-      "expected_output": "Identifies multiple issues to address: (1) backoffice info SCSS needs the colour values migrated from the v13 variables/_color.scss into the v17 backoffice info styles — that's why they're grey; (2) `.umb-block-grid` rules should be REMOVED from editor.scss because they now ship in the package at App_Plugins/Etch.Cms.Umbraco/src/block-grid-shadow.css — local rules conflict; (3) picker styles should move from editor.scss to the App_Plugins/Etch.Cms.Umbraco/umbraco-package.json setup; (4) add .stylelintcache to .gitignore. Points to scss-and-partials.md.",
+      "prompt": "Working through the v17 SCSS migration. I've imported blockpreview.scss from our v17 starter template. What else am I missing? The backoffice info partials look unstyled — they're showing in grey instead of our brand colour.",
+      "expected_output": "Identifies the issues to address: (1) backoffice info SCSS needs the colour values (not variable names) migrated from the v13 variables/_color.scss into the v17 backoffice info styles — that's why they're grey; if they stay grey, the SCSS isn't being included, so check the bundle config; (2) the compiled blockpreview.css must land at /css/blockpreview.css to match BlockPreview:BlockGrid:Stylesheet in appsettings.json; (3) add .stylelintcache to .gitignore. Points to scss-and-partials.md.",
       "files": [],
       "expectations": [
         "Identifies the grey backoffice info partials as needing brand colour values migrated from v13 SCSS variables into the v17 backoffice info styles",
-        "States that .umb-block-grid CSS rules should be REMOVED from editor.scss because they now ship inside the Etch.Cms package",
-        "Mentions that picker styles should move from editor.scss to the App_Plugins setup",
+        "Mentions checking the bundle config if the backoffice info styles still aren't applied",
+        "Notes the compiled blockpreview.css must match the BlockPreview:BlockGrid:Stylesheet path in appsettings.json",
         "Mentions adding .stylelintcache to .gitignore",
         "References scss-and-partials.md"
       ]
@@ -54,13 +54,13 @@
     {
       "id": 5,
       "prompt": "Content editors on our freshly-upgraded v17 site say the rich text editor feels 'wrong' compared to v13 — no word count, images they upload end up dumped in the root of the Media section, and they can't add buttons in body copy any more, only plain links. What do I need to change?",
-      "expected_output": "Identifies these as RTE/TipTap data type config gaps after the move from TinyMCE to TipTap. For every Rich Text data type: enable Word Count (off by default in v17), set the Image Upload Folder to a top-level 'Uploads' media folder (create it if missing), and apply the standard Etch toolbar layout rather than recreating the v13 TinyMCE toolbar. For buttons: register the Link Picker prop for TipTap from the v17 Etch.Cms template. Also mentions setting the max inserted image size to 1280. Points to rte-config.md.",
+      "expected_output": "Identifies these as RTE/TipTap data type config gaps after the move from TinyMCE to TipTap. For every Rich Text data type: enable Word Count (off by default in v17), set the Image Upload Folder to a top-level 'Uploads' media folder (create it if missing), and apply one standard toolbar layout rather than recreating the v13 TinyMCE toolbar. For buttons: register the Link Picker prop for TipTap from the v17 starter template or reference project. Also mentions setting the max inserted image size to 1280. Points to rte-config.md.",
       "files": [],
       "expectations": [
         "States Word Count must be enabled per Rich Text data type because it is off by default in v17",
         "States the Image Upload Folder should be set to a top-level 'Uploads' media folder (creating it if needed)",
-        "Identifies the missing buttons as needing the Link Picker prop for TipTap, taken from the v17 Etch.Cms template",
-        "Recommends applying the standard Etch toolbar layout rather than recreating the v13 TinyMCE toolbar one-for-one",
+        "Identifies the missing buttons as needing the Link Picker prop for TipTap, taken from the v17 starter template or reference project",
+        "Recommends applying one standard toolbar layout rather than recreating the v13 TinyMCE toolbar one-for-one",
         "References rte-config.md"
       ]
     }
