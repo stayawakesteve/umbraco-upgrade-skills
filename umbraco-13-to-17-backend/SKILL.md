@@ -47,9 +47,9 @@ In v13, adding the Contentment package was enough. In v17 you must chain `.AddCo
 the Umbraco builder in `Program.cs`. Skip it and Contentment silently breaks at runtime (data types
 using it can't be resolved). The recommended options are in `references/program-cs-v17.md` §1.
 
-This is the **canonical example** of "updated packages may have different requirements". Treat it as
-a warning sign: when you see a package version jump, check the release notes for new registration
-requirements before assuming the package is drop-in.
+Checking each bumped package's changelog for new registration requirements like this is step 3 of the
+package audit (`umbraco-13-to-17` → `references/pre-flight-checklist.md` §3). If that audit was
+skipped, do that check now for every package whose version jumped.
 
 ### 3. `RazorSourceGenerator` duplicate `hintName`
 
@@ -63,8 +63,8 @@ hintName, finding the source package, and the override options.
 
 The package audit in the router skill (`umbraco-13-to-17` → `references/pre-flight-checklist.md`)
 should have flagged these. When you hit a NuGet restore error, double-check it's listed in the audit.
-If a package genuinely has no v17 path, the upgrade *for that site* is blocked until you find an
-alternative — don't try to force the version.
+If a package genuinely has no v17 release, apply the audit's drop / replace / block decision for it —
+don't try to force the version.
 
 ## What "done" looks like for this skill
 

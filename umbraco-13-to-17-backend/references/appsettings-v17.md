@@ -31,7 +31,7 @@ v17 uSync uses an `AppId` / `AppKey` pair instead of older auth styles:
 ```
 
 Notes:
-- `AppId` is per-environment — generate a fresh GUID for each site
+- `AppId` is per-environment — generate a fresh GUID for each environment
 - `AppKey` should be set via `dotnet user-secrets`, never committed
 - `ExportOnSave: "Settings"` exports settings (doc types, data types, templates) on save but not
   content — content is exported on demand
@@ -83,7 +83,7 @@ A fresh v17 install sets these — older v13 sites may not have them:
 "Umbraco": {
   "CMS": {
     "Global": {
-      "Id": "<unique-guid-per-site>"
+      "Id": "<unique-guid-per-environment>"
     },
     "Content": {
       "AllowEditInvariantFromNonDefault": true,
@@ -95,8 +95,7 @@ A fresh v17 install sets these — older v13 sites may not have them:
 }
 ```
 
-`Global.Id` should be a unique GUID per environment — used internally for telemetry / version checks.
-Generate one if it's missing.
+`Global.Id` is used internally for telemetry / version checks. Generate one if it's missing.
 
 `ContentVersionCleanupPolicy.EnableCleanup: true` keeps the database from bloating with old content
 versions. New default in v13+; some v13 sites may have it disabled — turn it on.

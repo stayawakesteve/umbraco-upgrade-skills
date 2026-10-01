@@ -26,8 +26,9 @@ For each customised v13 template:
 ## Common customisations to watch for
 
 - **Custom wrapper classes** on form/field elements — easy to bring across, just re-add
-- **Custom field type partials** (e.g. a custom Date field renderer) — check that the v17 Forms
-  field type interface hasn't changed; if it has, you may need to rewrite the partial
+- **Custom field type partials** (e.g. a custom Date field renderer) — check the partial's `@model`
+  declaration against the v17 Forms field type interface; if it has changed, the field renders as
+  plain text and you may need to rewrite the partial
 - **JavaScript hooks** attached to specific class names — verify the class names still match in
   v17, since some have changed
 
@@ -65,7 +66,6 @@ After the merge:
 
 - **Submissions silently failing** — usually a JavaScript error in client-side validation; check
   the browser console
-- **reCAPTCHA not appearing** — confirm the SiteKey/PrivateKey are still set in `appsettings.json`
-  under `Umbraco.Forms.FieldTypes.Recaptcha3`
-- **Custom field types rendering as plain text** — the field type partial's `@model` declaration
-  may have changed in v17; check against the v17 Forms package interface
+- **reCAPTCHA not appearing** — confirm the Recaptcha3 SiteKey/PrivateKey are still set in
+  `appsettings.json` (see `umbraco-13-to-17-backend` → `references/appsettings-v17.md`, "Umbraco
+  Forms RichText data type")

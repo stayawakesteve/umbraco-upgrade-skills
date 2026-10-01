@@ -8,7 +8,9 @@ The type or namespace name 'IPublishedSnapshotAccessor' could not be found
 ```
 
 This is because Umbraco 17 removed `IPublishedSnapshotAccessor` and the pre-existing generated
-`*.generated.cs` files (output by the v13 ModelsBuilder) reference it everywhere.
+`*.generated.cs` files (output by the v13 ModelsBuilder when `ModelsMode` is `SourceCodeAuto` or
+`SourceCodeManual`) reference it everywhere. Sites on `InMemoryAuto` have no committed generated files
+and skip this step.
 
 ## Two ways to fix
 
@@ -22,7 +24,6 @@ Apply across all `*.generated.cs` files in the Models project.
 **When to choose this:**
 - Smaller sites (under ~50 doc types)
 - You want to keep git history of the generated files
-- The site uses `ModelsMode: SourceCode` (committed generated models)
 
 ### Option B: Nuke and regenerate
 

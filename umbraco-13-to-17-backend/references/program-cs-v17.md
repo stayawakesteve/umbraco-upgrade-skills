@@ -25,8 +25,7 @@ umbracobuilder.Build();
 ```
 
 Keep any site-specific registrations your v13 `Program.cs` had (custom composers, extension
-methods from your own or third-party packages) — check each package's v17 release notes for
-changed registration calls.
+methods from your own or third-party packages).
 
 ## The four things to get right
 
