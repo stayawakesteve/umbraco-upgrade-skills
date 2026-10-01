@@ -6,7 +6,7 @@ On a **fresh** v17 database (rather than an upgraded v13 DB), uSync template imp
 only some templates — typically just those with `Layout = null`. Every template using a master
 layout silently fails to import.
 
-The backoffice will then show:
+Browsing the site then shows:
 
 > No template exists to render the document at URL '/'
 
@@ -22,7 +22,7 @@ them fail silently with `result: false`.
 
 When uSync's `TemplateSerializer` imports a template, Umbraco's `TemplateService` parses the
 `Layout` directive in the `.cshtml` content to resolve the master template relationship. Templates
-reference the master layout as `Layout = "Layout.cshtml"`. If the `Layout` template doesn't
+reference the master layout by name, e.g. `Layout = "Layout.cshtml"`. If the `Layout` template doesn't
 exist as an Umbraco template record in the database yet, the import fails.
 
 ## The fix
@@ -32,10 +32,10 @@ files in alphabetical order within a folder and `_` sorts before any letter, so 
 and every later `Layout = "Layout.cshtml"` reference resolves.
 
 Copy `assets/_layout.config` to `uSync/v17/Templates/_layout.config` and replace `<new-guid>` with a
-freshly-generated GUID. This is a deliberately **minimal** template
-config — just enough to register the template in Umbraco so subsequent imports can reference it.
-The full `.cshtml` content gets imported separately by the regular `Layout.config` file (which
-sorts alphabetically after `_layout.config`).
+freshly-generated GUID. If your master template isn't `Layout.cshtml`, set `Alias` and `<Name>` in the
+copied file to your master template's alias (keep the `_` filename prefix). This is a deliberately
+**minimal** template config — just enough to register the template in Umbraco so subsequent imports can reference it.
+The full `.cshtml` content gets imported separately by the regular `Layout.config` file.
 
 The `Level="1"` indicates a root-level template. The `<Parent />` element is empty because the
 master layout has no parent template.
@@ -45,8 +45,6 @@ master layout has no parent template.
 - **Fresh v17 DB** — yes, you need it
 - **v13 DB migrated to v17 schema** — usually not needed (the templates already exist from the v13
   install)
-- **Restoring from a v13 DB backup to a v17 schema** — yes, you need it (templates may not
-  re-register correctly)
 
 If unsure, run the uSync import without the fix first and watch for the `result: false` entries
 in the log. If templates are failing, add the fix.

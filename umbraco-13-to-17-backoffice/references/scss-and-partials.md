@@ -29,7 +29,8 @@ Migration steps:
 
 ## 3. `.stylelintcache` in `.gitignore`
 
-v17 brings in stylelint at the project level. Add `.stylelintcache` to `.gitignore`:
+If the project's front-end tooling (e.g. from your v17 starter template or reference project) runs
+stylelint, add `.stylelintcache` to `.gitignore`:
 
 ```gitignore
 # Stylelint cache
@@ -41,7 +42,7 @@ stylelint cache file.
 
 ## Verifying
 
-After all SCSS / partial work:
+After all SCSS work:
 
 1. Run the SCSS build and confirm `blockpreview.css` is produced
 2. Load the backoffice and check:

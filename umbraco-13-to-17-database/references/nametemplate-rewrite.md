@@ -6,23 +6,18 @@ In v13, block labels and `nameTemplate` fields used AngularJS template syntax. I
 ## What needs migrating
 
 Anywhere a template string uses AngularJS expressions like `{{ ... }}` with helpers like
-`ncNodeName`. This appears in:
-
-- **uSync data type configs** (`uSync/v17/DataTypes/*.config`) — the `nameTemplate` of Block List
-  and Block Grid data types
-- **Block labels** in the backoffice (these can be fixed via the UI or via the uSync files —
-  doing it in the uSync files is faster for sites with lots of blocks)
+`ncNodeName`. This appears in uSync data type configs (`uSync/v17/DataTypes/*.config`) — the
+per-block `"label"` of Block List and Block Grid data types, and `"nameTemplate"` on any data type
+that still has one.
 
 ## The transformation
 
-| AngularJS                       | UFM                          |
-|---------------------------------|------------------------------|
-| `{{ heading }}`                 | `{$heading}` or `{heading}`  |
-| `{{ value | ncNodeName }}`      | `{umbContentName: value}`    |
-| `{{ value | take:50 }}`         | `{value:take:50}`            |
-| `{{ value or 'fallback' }}`     | `{$value:fallback('fallback')}` |
+- `{{ heading }}` → `{=heading}` (short for `{umbValue: heading}`)
+- `{{ value | ncNodeName }}` → `{umbContentName: value}`
+- `{{ title | limitTo:38 }}` → `${ title | truncate: 38 }` (a UFM expression)
 
-The `$` prefix references a property.
+`{=alias}` outputs a property's value. Filters and logic use the separate `${ ... }` expression
+syntax, e.g. `${ title || subtitle }` for a fallback.
 
 UFM has its own filter syntax — get each filter from the Umbraco UFM docs rather than mapping
 filter-by-filter from memory.
@@ -34,7 +29,7 @@ filter-by-filter from memory.
 For each affected data type:
 
 1. Open `uSync/v17/DataTypes/<datatype-name>.config`
-2. Find the `nameTemplate` value
+2. Find the `label` / `nameTemplate` value
 3. Rewrite to UFM
 4. Save
 
@@ -45,7 +40,13 @@ A bulk find/replace works for common patterns:
 ```
 Find:    "nameTemplate":\s*"\{\{\s*value\s*\|\s*ncNodeName\s*\}\}"
 Replace: "nameTemplate": "{umbContentName: value}"
+
+Find:    "label":\s*"\{\{\s*value\s*\|\s*ncNodeName\s*\}\}"
+Replace: "label": "{umbContentName: value}"
 ```
+
+Grep one Block List `.config` from the v17 export for `"label":` to confirm the key before running
+the bulk replace.
 
 But the more interesting templates have property-specific expressions that need manual review.
 
@@ -64,5 +65,5 @@ After the rewrite:
 1. Open a Block Grid data type in the backoffice — labels for each block should render correctly
 2. Open a content node using the data type — block labels in the editor should show real values
    (not the literal template syntax)
-3. Search the uSync files for `{{ ` — there shouldn't be any matches in `Content/` or `DataTypes/`
-   folders if the rewrite is complete
+3. Search `uSync/v17/DataTypes/` for `{{` — there shouldn't be any matches if the rewrite is
+   complete

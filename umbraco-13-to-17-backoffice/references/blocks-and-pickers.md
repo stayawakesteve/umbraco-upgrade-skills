@@ -1,4 +1,4 @@
-# Blocks and labels
+# Blocks
 
 ## 1. BlockPreview off on BlockList
 
@@ -24,7 +24,7 @@ In `appsettings.json`:
 ## 2. Backoffice info partials on all blocks
 
 For older sites where backoffice info partials were only applied to *some* block types
-(typically just Section), v17 expects them on all blocks for consistency.
+(typically just Section), apply them to every block type so editors get the same info on every block.
 
 In each block component partial (e.g. `Views/Partials/blockgrid/Components/MyBlock.cshtml`):
 

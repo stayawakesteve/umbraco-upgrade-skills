@@ -30,8 +30,8 @@ type.
 
 ### 3. Maximum size for inserted images: `1280`
 
-Set in the data type config under "Image upload size". 1280 is a sensible default — it balances quality
-against page weight, and matches the largest breakpoint in the standard responsive image set.
+1280 is a sensible default — it balances quality against page weight. If the site's own responsive
+image sizes go larger, match its largest size instead.
 
 ### 4. Image Upload Folder = "Uploads"
 
@@ -39,7 +39,7 @@ Create a folder in the Media section called `Uploads` (top-level). Configure the
 to that folder.
 
 Without this set, images uploaded via the RTE land in the Media root, which clutters Media for content
-editors. The `Uploads` folder is the agreed staging area for RTE-uploaded media.
+editors.
 
 ## Project-wide RTE additions
 
@@ -79,15 +79,14 @@ need watching:
 - **Inline styles** were sometimes added by TinyMCE; TipTap is stricter. Editors may need to redo
   styling once.
 - **Embedded media** (YouTube, Twitter) embedded via TinyMCE oEmbed plugin: confirm they still
-  render. If not, see `umbraco-13-to-17-backend` → `references/program-cs-v17.md`, section "YouTube
-  backoffice CSP middleware".
+  render.
 
 ## Verifying
 
 For each RTE data type:
 
-1. Open the data type config and confirm: Word Count on, standard toolbar layout, max image 1280,
-   Uploads folder set
+1. Open the data type config and confirm: Word Count on, standard toolbar layout, max image size
+   per §3, Uploads folder set
 2. Open a content node using that data type and verify the editor loads with the expected toolbar
 3. Try inserting an image — confirm it lands in the `Uploads` folder
 4. Try inserting a button (if Link Picker is registered)

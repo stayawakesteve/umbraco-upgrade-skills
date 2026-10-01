@@ -13,9 +13,11 @@ example: nav items disappear, sidebar widgets vanish, hero sections don't show.
 In v17, `""` is treated as hidden. So any v13 block with `"visible": ""` migrates to a hidden state.
 
 **Fix:** Run the v13-side `fix-visible-property.ps1` script **before** starting the upgrade.
-Targets `uSync\v9\Content` (hardcoded; the folder name is historical — confirm it matches where your
-v13 uSync content lives before running), replaces `"visible": ""` with `"visible": "1"`, then
-re-import uSync on v13 and commit.
+Run it from the folder that contains `uSync\`
+(`& <path-to-this-skill>\scripts\fix-visible-property.ps1`) — its target, `uSync\v9\Content`, is
+hardcoded and relative to the current directory (the folder name is historical — confirm it matches
+where your v13 uSync content lives before running). It replaces `"visible": ""` with
+`"visible": "1"`; then re-import uSync on v13 and commit.
 
 This is a **pre-flight** fix, not a post-upgrade fix. If you missed it and you're already on v17,
 your options are:
@@ -92,9 +94,9 @@ you have a startup import) — steps in `usync-workflow.md` Step 2.
 
 ## Cross-cutting principle
 
-These bugs share a pattern: **what worked silently in v13 becomes a no-op in v17 because of stricter
-handling**. Empty strings become hidden. Stale published states become missing content. Misaligned
-property aliases become missing data types. Case-insensitive orderBy matching becomes case-sensitive.
+§1 and §4 share a pattern: **what worked silently in v13 breaks in v17 because of stricter
+handling** — empty strings become hidden, case-insensitive `orderBy` matching becomes
+case-sensitive.
 
 When troubleshooting other "looks fine on v13, breaks on v17" symptoms, look for the same shape:
 some convention in v13 that depended on lenient interpretation now needs to be made explicit.

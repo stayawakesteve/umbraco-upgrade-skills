@@ -28,7 +28,7 @@ These are roughly independent, but doing them in this order minimises rework:
    See `references/scss-and-partials.md`.
 2. **RTE config** — Word Count, toolbar layout, max image size, Uploads folder, Link Picker
    prop for TipTap. See `references/rte-config.md`.
-3. **Blocks and labels** — BlockPreview off for BlockList (double-render / stuck-preview in the
+3. **Blocks** — BlockPreview off for BlockList (double-render / stuck-preview in the
    BlockList editor), backoffice info partials applied to all blocks. See
    `references/blocks-and-pickers.md`.
 

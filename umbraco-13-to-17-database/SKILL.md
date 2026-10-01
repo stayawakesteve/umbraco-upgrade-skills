@@ -19,8 +19,9 @@ backoffice and frontend changes are owned by `umbraco-13-to-17-backoffice` and
 
 ## The canonical workflow
 
-1. **Pre-flight, on v13, before the upgrade** — run `scripts/fix-visible-property.ps1` against v13
-   `uSync\v9\Content`, re-import, commit. This is the only fix that must happen *before* the upgrade.
+1. **Pre-flight, on v13, before the upgrade** — run `scripts/fix-visible-property.ps1` (procedure and
+   target-folder caveat: `references/content-migration-gotchas.md` §1). This is the only fix that must
+   happen *before* the upgrade.
 2. **Everything else, once the v17 site compiles and boots** (backend skill done) — follow
    `references/usync-workflow.md` Steps 1-6 in order (Step 2 runs
    `scripts/fix-listview-orderby-casing.ps1`).

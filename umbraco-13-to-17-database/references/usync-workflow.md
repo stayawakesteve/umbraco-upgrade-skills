@@ -20,7 +20,7 @@ With the v17 site running against the v13 DB:
 This writes uSync files to `uSync/v17/`. Inspect the output — if any export step errored, fix that
 before continuing (usually a specific data type is causing issues; check the log).
 
-## Step 2: Apply the fix scripts to the exported files
+## Step 2: Fix the exported files
 
 ### `nameTemplate` UFM rewrite
 
@@ -29,11 +29,13 @@ recommended files-then-backoffice approach.
 
 ### List View `orderBy` casing
 
+Run it from the folder that contains `uSync\` — its target, `uSync\v17\DataTypes`, is hardcoded and
+relative to the current directory (confirm yours matches before running):
+
 ```powershell
-.\scripts\fix-listview-orderby-casing.ps1
+& <path-to-this-skill>\scripts\fix-listview-orderby-casing.ps1
 ```
 
-The script targets `uSync\v17\DataTypes` (hardcoded path — confirm yours matches before running).
 It re-cases each List View `orderBy` value to match a configured alias (`SortOrder` → `sortOrder`)
 and renames the legacy `VersionDate` to `updateDate`.
 
@@ -47,7 +49,8 @@ example):
 
 1. Open `uSync/v17/DataTypes/<datatype-name>.config`
 2. Find the `<EditorAlias>` element
-3. Update to the new alias (consult the package's v17 docs for the correct alias)
+3. Update to the new alias (how to find it: `references/content-migration-gotchas.md` §3, "Discovery
+   process")
 
 ## Step 4: Re-import
 
@@ -65,7 +68,7 @@ see `references/template-import-order.md`.
 ## Step 5: Force-republish via uSync (the homepage workaround)
 
 This step works around the content-not-rendering bug after migration. See
-`references/content-migration-gotchas.md` for context.
+`references/content-migration-gotchas.md` §2 for context.
 
 1. From v17, do another full uSync export (capturing the current state including the fixes above)
 2. In the backoffice, **delete the home node** and clear it from the Recycle Bin
