@@ -25,7 +25,8 @@ running the visible-fix script *after* the v17 import is too late.
 ### Step 0 — Pre-flight (do not skip)
 
 Before you change a line of code, walk every item in `references/pre-flight-checklist.md`. §1 (running
-`fix-visible-property.ps1` on v13) is the one item that can't be done later.
+`fix-visible-property.ps1` on v13) and §5 (backing up the v13 DB) are the items that can't be done
+later.
 
 ### Step 1 — Backend retarget (gets the site compiling)
 
@@ -33,7 +34,7 @@ Hand off to **`umbraco-13-to-17-backend`**. That skill covers:
 
 - Retargeting `.csproj` to `net10.0` and updating package versions
 - Updating `Program.cs` to the v17 shape (Contentment registration, etc.)
-- The ModelsBuilder `IPublishedSnapshotAccessor` → `IPublishedContentTypeCache` mass replace
+- ModelsBuilder generated files that reference `IPublishedSnapshotAccessor` (mass replace or regenerate)
 - The `RazorSourceGenerator` duplicate-`hintName` build error
 - `appsettings.json` v17 changes
 
@@ -63,7 +64,7 @@ Hand off to **`umbraco-13-to-17-database`**. That skill covers:
 
 - `blockpreview.scss`, backoffice info partials and SCSS
 - RTE config (Word Count, toolbar layout, image sizing, Uploads media folder), Link Picker prop for TipTap
-- BlockPreview disabled on BlockList, UFM block labels
+- BlockPreview disabled on BlockList
 - YouTube backoffice CSP fix
 
 **Frontend** — hand off to **`umbraco-13-to-17-frontend`**. That skill covers:
@@ -72,8 +73,9 @@ Hand off to **`umbraco-13-to-17-database`**. That skill covers:
 - The nested-section BlockGrid frontend fix
 - Umbraco Forms template merge
 
-Steps 3 and 4, and the two halves of Step 4, all touch different files, so with a second pair of hands
-they can run in parallel. Solo, do Step 3 first because content issues block QA. Within Step 4, do the frontend
+Step 3 and Step 4 mostly touch different files, so with a second pair of hands they can run in
+parallel. The exception is the backoffice RTE data-type config: it lives in the same
+`uSync/v17/DataTypes` files Step 3 edits and re-imports, so apply it after Step 3's final import. Solo, do Step 3 first because content issues block QA. Within Step 4, do the frontend
 dictionary change before any QA pass — it causes false "missing content" reports.
 
 ### Step 5 — Verify
@@ -85,16 +87,19 @@ Read `references/done-checklist.md` and walk every item — the site isn't "upgr
 If the user says something like "my templates aren't importing" or "blocks are showing as hidden",
 **don't restart from Step 0**. Skip directly to the sub-skill that owns that symptom:
 
-- Build errors, missing namespaces, package conflicts → `umbraco-13-to-17-backend`
-- uSync import failures, missing content, wrong visibility, template not found, List View `orderBy` errors → `umbraco-13-to-17-database`
-- Editor-facing: RTE/TipTap, block previews or labels, backoffice info, backoffice SCSS, YouTube in the RTE → `umbraco-13-to-17-backoffice`
+- Build errors or a `CS8785` RazorSourceGenerator warning (which can surface at runtime as "template
+  not found"), missing namespaces, package conflicts → `umbraco-13-to-17-backend`
+- uSync import failures, missing content, wrong visibility, template not found after a uSync import,
+  List View `orderBy` errors, block labels showing literal `{{ ... }}` → `umbraco-13-to-17-database`
+- Editor-facing: RTE/TipTap, block previews, backoffice info, backoffice SCSS, YouTube in the RTE →
+  `umbraco-13-to-17-backoffice`
 - Visitor-facing: dictionary keys on the page, nested sections, Forms → `umbraco-13-to-17-frontend`
 
 ## Things this skill deliberately does NOT do
 
 - **Doesn't run NuGet package updates for you.** Listing the v17-compatible version of every package
   is project-specific; the backend skill explains *which* packages and what's changed, but the actual
-  versioning happens in `Directory.Packages.props` and is per-project.
+  version numbers are per-project.
 - **Doesn't migrate content automatically.** uSync export/import is a manual, supervised process —
   the scripts fix specific bugs, but you still need to eyeball the diffs.
 - **Doesn't cover greenfield v17 setup.** This is for *upgrading* an existing v13 site. For a new build

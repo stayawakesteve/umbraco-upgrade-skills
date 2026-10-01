@@ -59,14 +59,14 @@
     {
       "id": 5,
       "prompt": "Done with the Umbraco upgrade — site builds, boots, all the content seems to migrate fine, RTE looks good. About to merge feature/v17 to main. Anything I should double-check before doing that?",
-      "expected_output": "Walks through the done-checklist concerns: build is clean with no RazorSourceGenerator warnings, all CS8785 warnings cleared, content visibility states correct, templates appearing (no fall-through to 404), backoffice info partials rendering, GetDictionaryValue replaced with GetDictionaryValueOrDefault, BlockPreview disabled for BlockList, CSP console-clean, YouTube embeds work in backoffice, Forms submit end-to-end. Points to done-checklist.md.",
+      "expected_output": "Walks through the done-checklist concerns: build is clean with no RazorSourceGenerator warnings, all CS8785 warnings cleared, content visibility states correct, templates appearing (no fall-through to 404), backoffice info partials rendering, GetDictionaryValue replaced with GetDictionaryValueOrDefault, BlockPreview disabled for BlockList, YouTube embeds work in backoffice, Forms submit end-to-end. Points to done-checklist.md.",
       "files": [],
       "expectations": [
         "References done-checklist.md or provides checks clearly derived from it",
         "Mentions CS8785 RazorSourceGenerator hintName warnings must all be clear before merging",
         "Mentions content visibility states must be verified (blocks/nodes correctly shown or hidden)",
         "Mentions GetDictionaryValue must be replaced with GetDictionaryValueOrDefault",
-        "Mentions CSP console-clean check (no CSP errors on frontend)",
+        "Mentions YouTube embeds working in the backoffice (Referrer-Policy override in Program.cs)",
         "Mentions BlockPreview disabled for BlockList"
       ]
     }

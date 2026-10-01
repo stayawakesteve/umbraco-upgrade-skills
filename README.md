@@ -121,7 +121,9 @@ order wastes time, e.g. exporting uSync from a site that doesn't build yet gives
 2. **ModelsBuilder.** Rebuild the models on v17.
 3. **Database and content.** Export uSync from v17, run the fix scripts, re-import, then
    force a republish.
-4. **Backoffice and frontend.** Separate files, so two people can do these at the same time.
+4. **Backoffice and frontend.** Mostly separate files from step 3 and from each other, so a second
+   person can work on them in parallel. The exception is the RTE data-type settings: they live in
+   the uSync data type files that step 3 re-imports, so apply them after step 3's final import.
 5. **Verify.** Work through the done checklist before merging.
 
 If you're already part-way through, skip ahead: describe the symptom and the assistant goes
