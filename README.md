@@ -1,6 +1,8 @@
 # Umbraco 13 → 17 upgrade skills
 
-Five agent skills that guide an AI coding assistant through upgrading an Umbraco site from
+My own (mostly) unopinionated set of AI skills to assist with upgrading from Umbraco 13.x to 17.x.
+
+This repo contains five agent skills that guide an AI coding assistant through upgrading from
 Umbraco 13 (.NET 8) to Umbraco 17 (.NET 10). They cover the build, the database and uSync
 content, the backoffice, and the frontend views, including the known v17 migration bugs and
 their fixes.
@@ -69,7 +71,7 @@ of copying.
 
 You don't need to name a skill. Each one has a description of the situations it handles, and the
 assistant loads the right one when your request matches. Mention **v13 and v17** (or "Umbraco
-17") so it knows you're mid-upgrade:
+17") so it knows you're mid-upgrade, for example:
 
 > We're upgrading this site from Umbraco 13 to 17. Where do I start?
 
@@ -79,8 +81,6 @@ assistant loads the right one when your request matches. Mention **v13 and v17**
 > Umbraco 17 won't build: IPublishedSnapshotAccessor errors in the generated models.
 
 > Our pages show dictionary keys like `footer.copyright` instead of text since moving to v17.
-
-> Editors say YouTube embeds in the rich text editor stopped working after the upgrade.
 
 > Can I just copy our v13 Umbraco Forms templates into the v17 site?
 
@@ -148,7 +148,7 @@ changes as a diff.
 ## Good to know
 
 - **They're for upgrades, not new builds.** For a new v17 site, start from a fresh Umbraco 17
-  install.
+  install or your boilerplate of choice.
 - **The assistant doesn't run the whole upgrade on its own.** Package versions, uSync imports
   and the fix scripts all need a person watching and reviewing the diffs.
 - **Each skill has an `evals/` folder.** These are test prompts for whoever maintains the skills.
