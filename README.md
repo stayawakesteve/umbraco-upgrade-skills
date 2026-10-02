@@ -1,6 +1,6 @@
 # Umbraco 13 → 17 upgrade skills
 
-My own (mostly) unopinionated set of AI skills to assist with upgrading from Umbraco 13.x to 17.x.
+An unopinionated set of AI skills to assist with upgrading from Umbraco 13.x to 17.x.
 
 This repo contains five agent skills that guide an AI coding assistant through upgrading from
 Umbraco 13 (.NET 8) to Umbraco 17 (.NET 10). They cover the build, the database and uSync
